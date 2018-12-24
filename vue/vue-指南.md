@@ -204,7 +204,7 @@ computed: {
 <div v-bind:class="[activeClass,errorClass]">
 data:{
   activeClass: 'active',
-  errorClass: 'text-danger
+  errorClass: 'text-danger'
 }
 <div v-bind:class="[isActive ? activeClass : '', errorClass]">
 <div v-bind:class="[{ active: isActive }, errorClass]">
