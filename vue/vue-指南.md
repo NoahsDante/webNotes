@@ -272,7 +272,7 @@ data:{
  Now you see me
 </div>
 <div v-else>
-  Now you don't
+  Now you don't'
 </div>
 ```
 
@@ -1347,7 +1347,7 @@ class="nav-link"
 	<h1 slot="header"></h1>
 	<p>A paragraph for the main content.</p>
 	<p>And another one.</p>
- 	<p slot="footer">Here's some contact info</p>
+ 	<p slot="footer">Here\'s some contact info</p>
 </base-layout>
 ```
 
