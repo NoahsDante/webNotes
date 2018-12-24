@@ -1347,7 +1347,7 @@ class="nav-link"
 	<h1 slot="header"></h1>
 	<p>A paragraph for the main content.</p>
 	<p>And another one.</p>
- 	<p slot="footer">Here\'s some contact info</p>
+ 	<p slot="footer">Here</p>
 </base-layout>
 ```
 
