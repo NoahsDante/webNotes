@@ -1297,6 +1297,8 @@ Object.prototype.toString.call(o).slice(8,-1)
 - 日期对象序列化的结果是ISO格式的日期字符串（参照Date.toJSON()函数）
 - 函数、RegExp、Error对象和undefined值不能序列化和还原
 
+# 数组
+
 
 
 
