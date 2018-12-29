@@ -998,17 +998,304 @@ f.email.value="";
 - 在严格模式中，标识符eval和arguments当做关键字，它们的值是不能更改的。不能给这些标识符赋值，也不能把它们声明为变量、用做函数名、用做函数参数或用做catch块的标识符。
 - 在严格模式中限制了对调用栈的检测能力，在严格模式的函数中，arguments.caller和arguments.callee都会抛出一个类型错误异常。严格模式的函数同样具有caller和arguments属性，当访问这两个属性时将抛出类型错误异常（有一些JavaScript的实现在非严格模式里定义了这些非标准的属性）
 
+# 对象
 
+对象是基本数据类型。是一种复合值：将很多值聚合在一起，可通过名字访问这些值，对象也可看做是属性的无序集合，每个属性都是一个名/值对。
 
+## 创建对像
 
+可以通过对象直接量、关键字new、object.create()
 
+### 对象直接量
 
+```javascript
+var empty={};//没有任何属性的对象
+var point={x:0,y:0};//两个属性
+var point2={x:point.x,y:point.y+1};//更复杂的值
+var book={
+    "main title":"JavaScript",//属性名字里有空格,必须用字符串表示
+'sub-title':"The Definitive Guide",//属性名字里有连字符，必须用字符串表示
+"for":"all audiences",//"for"是保留字，因此必须用引号
+author:{//这个属性的值是一个对象
+firstname:"David",//注意，这里的属性名都没有引号
+surname:"Flanagan"
+}
+};
+```
 
+对象直接量是一个表达式，这个表达式的每次运算都创建并初始化一个新的对象。每次计算对象直接量的时候，也会都会计算每个属性值。
 
+### 通过new创建对象
 
+new运算符创建并初始化一个新对象。关键字new后跟随一个函数调用。这里的函数称做构造函数，构造函数初始化一个新创建的对象。
 
+```javascript
+var o=new Object();//创建一个空对象，和{}一样
+var a=new Array();//创建一个空数组，和[]一样
+var d=new Date();//创建一个表示当前时间的Date对象
+var r=new RegExp("js");//创建一个可以进行模式匹配的EegExp对象
+```
 
+### 原型
 
+通过对象直接量创建对象都具有一个原型对象。并通过JavaScript	Object.prototype获得对原型对象的引用。
+
+通过关键字new和构造函数调用创建对象的原型就是构造函数的prototype属性的值。
+
+### Object.create()
+
+它创建一个新对象，其中第一个参数是这个对象原型，第二个参数，用以对象的属性进一步描述。
+
+它是一个静态函数，不是提供给某个对象调用方法。
+
+```javascript
+var o1=Object.create({x:1,y:2});//o1继承了属性x和y
+//可以通过传入参数null来创建一个没有原型的新对象，但通过这种方式创建的对象不会继承任何东西，甚至不包括基础方法，比如toString()
+var o2=Object.create(null);//o2不继承任何属性和方法
+// 如果想创建一个普通的空对象（比如通过{}或new Object()创建的对象），需要传入Object.prototype
+var o3=Object.create(Object.prototype);
+```
+
+## 属性的查询和设置
+
+以通过点(.)或方括号([])运算符来获取属性的值。运算符左侧应当是一个表达式，它返回一个对象。对于点(.)来说，右侧必须是一个以属性名称命名的简单标识符。对于方括号来说([])，方括号内必须是一个计算结果为字符串的表达式
+
+### 作为关联数组的对象
+
+第一种语法使用点运算符和一个标识符，这和C和Java中访问一个结构体或对象的静态字段非常类似。
+
+第二种语法使用方括号和一个字符串，看起来更像数组，只是这个数组元素是通过字符串索引而不是数字索引
+
+使用数组写法和用字符串表达是非常灵活。它使用字符串值（字符串值是动态的，可以在运行时更改）而不是标识符（标识符是静态的，必须写死在程序中）作为索引对属性进行访问
+
+### 继承
+
+一些属性是从原型对象继承而来的。
+
+假设要查询对象o的属性x，如果o中不存在x，那么将会继续在o的原型对象中查询属性x。如果原型对象中也没有x，但这个原型对象也有原型，那么继续在这个原型对象的原型上执行查询，直到找到x或者查找到一个原型是null的对象为止。可以看到，对象的原型属性构成了一个“链”，通过这个“链”可以实现属性的继承
+
+### 属性访问错误
+
+属性访问并不总是返回或设置一个值。当查询一个不存在的属性并不会报错，如果在对象o自身的属性或继承属性中均未找到属性x，属性访问表达式o.x返回undefined。
+
+## 删除属性
+
+delete运算符可以删除对象的属性。它的操作数应当是一个属性访问表达式；delete只是断开属性和宿主对象的联系，而不会去操作属性中的属性。
+
+delete运算符只能删除自有属性，不能删除继承属性（要删除继承属性必须从定义这个属性的原型对象上删除它，而且这会影响到所有继承自这个原型的对象。
+
+当delete表达式删除成功或没有任何副作用（比如删除不存在的属性）时，它返回true。如果delete后不是一个属性访问表达式，delete同样返回true。
+
+delete不能删除那些可配置性为false的属性（尽管可以删除不可扩展对象的可配置属性）。某些内置对象的属性是不可配置
+
+## 检测属性
+
+JavaScript对象可以看做属性的集合，——判断某个属性是否存在于某个对象中。
+
+可以通过in运算符、hasOwnPreperty()和propertyIsEnumerable()。
+
+**in运算符的左侧是属性名（字符串），右侧是对象。**如果对象的自有属性或继承属性中包含这个属性则返回true;可以区分不存在的属性和存在但值为undefined的属性
+
+对象的**hasOwnProperty()方法用来检测给定的名字是否是对象的自有属性。对于继承属性它将返回false**
+
+**propertyIsEnumerable()是hasOwnProperty()的增强版，只有检测到是自有属性且这个属性的可枚举性（enumerable attribute）为true时它才返回true**
+
+除了使用in运算符之外，另一种更简便的方法是使用**“!==”判断一个属性是否是undefined**
+
+## 枚举属性
+
+```javascript
+/*
+*把p中的可枚举属性复制到o中，并返回o
+*如果o和p中含有同名属性，则覆盖o中的属性
+*这个函数并不处理getter和setter以及复制属性
+*/
+function extend(o,p){
+for(prop in p){//遍历p中的所有属性
+o[prop]=p[prop];//将属性添加至o中
+}
+return o;
+}/*
+*将p中的可枚举属性复制至o中，并返回o
+*如果o和p中有同名的属性，o中的属性将不受影响
+*这个函数并不处理getter和setter以及复制属性
+*/
+function merge(o,p){
+for(prop in p){//遍历p中的所有属性
+if(o.hasOwnProperty[prop])continue;//过滤掉已经在o中存在的属性
+o[prop]=p[prop];//将属性添加至o中
+}
+return o;
+}/*
+*如果o中的属性在p中没有同名属性，则从o中删除这个属性
+*返回o
+*/
+function restrict(o,p){
+for(prop in o){//遍历o中的所有属性
+    if(!(prop in p))delete o[prop];//如果在p中不存在，则删除之
+}
+return o;
+}/*
+*如果o中的属性在p中存在同名属性，则从o中删除这个属性
+*返回o
+*/
+function subtract(o,p){
+for(prop in p){//遍历p中的所有属性
+delete o[prop];//从o中删除（删除一个不存在的属性不会报错）
+}
+return o;
+}/*
+*返回一个新对象，这个对象同时拥有o的属性和p的属性
+*如果o和p中有重名属性，使用p中的属性值
+*/
+function union(o,p){return extend(extend({},o),p);}/*
+*返回一个新对象，这个对象拥有同时在o和p中出现的属性
+*很像求o和p的交集，但p中属性的值被忽略
+*/
+function intersection(o,p){return restrict(extend({},o),p);}/*
+*返回一个数组，这个数组包含的是o中可枚举的自有属性的名字
+*/
+function keys(o){
+if(typeof o!=="object")throw TypeError();//参数必须是对象
+var result=[];//将要返回的数组
+for(var prop in o){//遍历所有可枚举的属性
+if(o.hasOwnProperty(prop))//判断是否是自有属性
+result.push(prop);//将属性名添加至数组中
+}
+return result;//返回这个数组
+}
+```
+
+## 属性getter和setter
+
+**对象是有名字、值和一组特性构成，属性值可以用一个或两个方法替代，getter和setter；由getter和setter定义的属性称做“存取器属性”（accessor property），它不同于“数据属性”（data property），数据属性只有一个简单的值。** 
+
+当程序查询存取器属性的值时，JavaScript调用getter方法（无参数）。这个方法的返回值就是属性存取表达式的值。
+
+当程序设置一个存取器属性的值时，JavaScript调用setter方法，将赋值表达式右侧的值当做参数传入setter。从某种意义上讲，这个方法负责“设置”属性值。可以忽略setter方法的返回值。
+
+存取器属性不具有可写性（writable attribute）。
+
+如果属性同时具有getter和setter方法，那么它是一个读/写属性。
+
+如果它只有getter方法，那么它是一个只读属性。
+
+如果它只有setter方法，那么它是一个只写属性（数据属性中有一些例外），读取只写属性总是返回undefined。
+
+存取器属性是**可以继承的**
+
+## 属性的特性
+
+可以对对象进行配置
+
+- 将它们设置成不可枚举，让它们更像内置方法
+- 将它们设置对象定义不能修改或删除属性。
+
+数据属性4个特性分别是它的值（value）、可写性（writable）、可枚举性（enumerable）和可配置性（configurable）
+
+存取器属性的4个特性是读取（get）、写入（set）、可枚举性和可配置性
+
+通过调用Object.getOwnPropertyDescriptor()可以获得某个对象特定属性的属性描述符
+
+要想设置属性的特性，或者想让新建属性具有某种特性，则需要调用Object.definePeoperty()，传入要修改的对象、要创建或修改的属性的名称以及属性描述符对象
+
+```javascript
+var o={};//创建一个空对象
+//添加一个不可枚举的数据属性x，并赋值为1
+Object.defineProperty(o,"x",{value:1,
+writable:true,
+enumerable:false,
+configurable:true});//属性是存在的，但不可枚举
+o.x;//=＞1
+Object.keys(o)//=＞[]//现在对属性x做修改，让它变为只读
+Object.defineProperty(o,"x",{writable:false});//试图更改这个属性的值
+o.x=2;//操作失败但不报错，而在严格模式中抛出类型错误异常
+o.x//=＞1//属性依然是可配置的，因此可以通过这种方式对它进行修改:
+Object.defineProperty(o,"x",{value:2});
+o.x//=＞2//现在将x从数据属性修改为存取器属性
+Object.defineProperty(o,"x",{get:function(){return 0;}});
+o.x//=＞0
+```
+
+传入Object.defineProperty()的属性描述符对象不必包含所有4个特性。对于新创建的属性来说，默认的特性值是false或undefined。对于修改的已有属性来说，默认的特性值没有做任何修改。
+
+如果要同时修改或创建多个属性，则需要使用Object.defineProperties()。第一个参数是要修改的对象，第二个参数是一个映射表，它包含要新建或修改的属性的名称，以及它们的属性描述符
+
+```javascript
+var p=Object.defineProperties({},{
+x:{value:1,writable:true,enumerable:true,configurable:true},
+y:{value:1,writable:true,enumerable:true,configurable:true},
+r:{
+get:function(){return Math.sqrt(this.x*this.x+this.y*this.y)},
+enumerable:true,
+configurable:true
+}
+});
+```
+
+对于那些不允许创建或修改的属性来说，如果用Object.defineProperty()和Object.defineProperties()对其操作或修改）就会抛出类型错误异常
+
+## 对象的三个属性
+
+每一个对象都有与之相关的原型（prototype）、类（class）和可扩展性（extensible attribute）；
+
+### 原型属性
+
+对象的原型属性是用来继承属性。原型属性是在实例对象创建之初就设置好的。
+
+要想检测一个对象是否是另一个对象的原型（或处于原型链中），请使用isPrototypeOf()方法
+
+### 类属性
+
+对象的类属性（class attribute）是一个字符串，用以表示对象的类型信息；想获得对象的类，可以调用对象的toString()方法
+
+```javascript
+Object.prototype.toString.call(o).slice(8,-1)
+```
+
+### 可扩展性
+
+表示是否可以给对象添加新属性;所有内置对象和自定义对象都是显式可扩展的，宿主对象的可扩展性是由JavaScript引擎定义。
+
+用来查询和设置对象可扩展性的函数
+
+#### Object.esExtensible()
+
+通过将对象传入**来判断该对象是否是可扩展的。**
+
+#### Object.preventExtensions()
+
+如果想将**对象转换为不可扩展的，**
+
+- 将待**转换的对象作为参数传进去。注意，一旦将对象转换为不可扩展的，就无法再将其转换回可扩展的了。**
+- **preventExtensions()只影响到对象本身的可扩展性。**
+- 如果给**一个不可扩展的对象的原型添加属性，这个不可扩展的对象同样会继承这些新属性**
+
+#### Object.seal()
+
+能够将对象设置为不可扩展;将对象的所有自有属性都设置为不可配置;不能给这个对象添加新属性，**而且它已有的属性也不能删除或配置，不过它已有的可写属性依然可以设置;**
+
+#### Object.isSealed()
+
+检测对象是否封闭
+
+#### Object.freeze()
+
+更严格地锁定对象——“冻结”（frozen）。**除了将对象设置为不可扩展的和将其属性设置为不可配置的之外，还可以将它自有的所有数据属性设置为只读**（如果对象的存取器属性具有setter方法，存取器属性将不受影响，仍可以通过给属性赋值调用它们）
+
+#### Object.isFrozen()
+
+检测对象是否冻结
+
+## 序列化对象
+
+将对象的状态转换为字符串，也可将字符串还原为对象
+
+### 转换规则
+
+- NaN、Infinity和-Infinity序列化的结果是null
+- 日期对象序列化的结果是ISO格式的日期字符串（参照Date.toJSON()函数）
+- 函数、RegExp、Error对象和undefined值不能序列化和还原
 
 
 
