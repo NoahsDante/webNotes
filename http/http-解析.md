@@ -89,3 +89,47 @@ TCP/IP 隐藏了各种网络和硬件的特点及弱点，使各种类型的计�
 **在 HTTP 客户端向服务器发送报文之前，需要用网际协议（Internet Protocol，IP）地址和端口号在客户端和服务器之间建立一条 TCP/IP 连接**
 
 ![image](https://github.com/NoahsDante/webNotes/blob/master/http/img/3.png)
+
+#### 步骤
+
+1. 浏览器从 URL 中**解析出服务器的主机名**；
+2. 浏览器将服务器的**主机名转换成服务器的 IP 地址**；
+3. 浏览器将端口号（如果有的话）从 URL 中解析出来；
+4. 浏览器**建立一条与 Web 服务器的 TCP 连接；**
+5. 浏览器**向服务器发送一条 HTTP 请求报文；**
+6. 服务器**向浏览器回送一条 HTTP 响应报文；**
+7. **关闭连接，浏览器显示文档。**
+
+## Web 的结构组件
+
+### 代理
+
+**代理位于客户端和服务器之间，接收所有客户端的 HTTP 请求，并将这些请求转发给服务器（可能会对请求进行修改之后转发）**
+
+![image](https://github.com/NoahsDante/webNotes/blob/master/http/img/4.png)
+
+### 缓存
+
+Web 缓存（Web cache）或代理缓存（proxy cache）是一种特殊的 HTTP 代理服务器，**可以将经过代理传送的常用文档复制保存起来。下一个请求同一文档的客户端就可以享受缓存的私有副本所提供的服务**
+
+![image](https://github.com/NoahsDante/webNotes/blob/master/http/img/5.png)
+
+### 网关
+
+网关（gateway）是一种特殊的服务器，**作为其他服务器的中间实体使用。通常用于将 HTTP 流量转换成其他的协议。网关接受请求时就好像自己是资源的源端服务器一样**。**客户端可能并不知道自己正在与一个网关进行通信**
+
+### 隧道
+
+隧道（tunnel）是建立起来之后，就会在两条连接之间对原始数据进行盲转发的 HTTP 应用程序。**HTTP 隧道通常用来在一条或多条 HTTP 连接上转发非 HTTP 数据，转发时不会窥探数据。**
+
+HTTP 隧道的一种常见用途是**通过 HTTP 连接承载加密的安全套接字层（SSL， Secure Sockets Layer）流量，这样 SSL 流量就可以穿过只允许 Web 流量通过的防火墙**
+
+![image](https://github.com/NoahsDante/webNotes/blob/master/http/img/6.png)
+
+### Agent代理
+
+用户 Agent 代理（或者简称为 Agent 代理）是代表用户发起 HTTP 请求的客户端程序。所有发布 Web 请求的应用程序都是 HTTP Agent 代理。到目前为止，我们只提到过一种 HTTP Agent 代理：Web 浏览器，但用户 Agent 代理还有很多其他类型。
+
+比如，有些自己会在 Web 上闲逛的自动用户 Agent 代理，可以在无人监视的情况下发布 HTTP 事务并获取内容。这些自动代理的名字通常都很生动，比如“网络蜘蛛”（spiders）或者“Web 机器人”（Web robots）。网络蜘蛛会在 Web 上闲逛，搜集信息以构建有效的 Web 内容档案
+
+![image](https://github.com/NoahsDante/webNotes/blob/master/http/img/7.png)
