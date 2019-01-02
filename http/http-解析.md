@@ -523,25 +523,277 @@ DELETE 方法所做的事情就是**请服务器删除请求 URL 所指定的资
 
 表示**服务器暂处于负荷状态或正在进行停机维护，现在无法请求**。
 
+## 首部
 
+**首部和方法配合工作，共同决定了客户端和服务器能做什么事情**
 
+### 通用首部
 
+是客户端和服务器都可以使用的通用首部；提供了与报文相关的最基本的信息
 
+#### Cache-Control
 
+操作缓存的工作机制；指令的参数是可选的，多个指令之间通过“,”分隔
 
+Cache-Control: private, max-age=0, no-cache
 
+缓存请求指令
+no-cache	无	强制向源服务器再次验证
+no-store	无	不缓存请求或响应的任何内容
+max-age = [ 秒]	必需	响应的最大Age值
+max-stale( = [ 秒])	可省略	接收已过期的响应
+min-fresh = [ 秒]	必需	期望在指定时间内的响应仍有效
+no-transform	无	代理不可更改媒体类型
+only-if-cached	无	从缓存获取资源
+cache-extension	-	新指令标记（token）
 
+缓存响应指令
 
+public	无	可向任意方提供响应的缓存
+private	可省略	仅向特定用户返回响应
+no-cache	可省略	缓存前必须先确认其有效性
+no-store	无	不缓存请求或响应的任何内容
+no-transform	无	代理不可更改媒体类型
+must-revalidate	无	可缓存但必须再向源服务器进行确认
+proxy-revalidate	无	要求中间缓存服务器对缓存的响应有效性再进行确认
+max-age = [ 秒]	必需	响应的最大Age值
+s-maxage = [ 秒]	必需	公共缓存服务器响应的最大Age值
+cache-extension	-	新指令标记（token）
 
+## 请求首部字段
 
+从客户端往服务器端发送请求报文中所使用的字段，用于补充请求的附加信息、客户端信息、对响应内容相关的优先级等内容
 
+### Accept
 
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
 
+Accept 首部字段可通知服务器，用户代理能够处理的媒体类型及媒体类型的相对优先级
 
+### Accept-Charset
 
+Accept-Charset: iso-8859-5, unicode-1-1;q=0.8
 
+用来通知服务器用户代理支持的字符集及字符集的相对优先顺序。另外，可一次性指定多种字符集。与首部字段 Accept 相同的是可用权重 q 值来表示相对优先级
 
+### Accept-Encoding
 
+Accept-Encoding: gzip, deflate
 
+用来告知服务器用户代理支持的内容编码及内容编码的优先级顺序。可一次性指定多种内容编码
 
+### Accept-Language
 
+Accept-Language: zh-cn,zh;q=0.7,en-us,en;q=0.3
+
+来告知服务器用户代理能够处理的自然语言集（指中文或英文等），以及自然语言集的相对优先级。可一次指定多种自然语言集
+
+### Authorization
+
+Authorization: Basic dWVub3NlbjpwYXNzd29yZA==
+
+来告知服务器，用户代理的认证信息（证书值）。通常，想要通过服务器认证的用户代理会在接收到返回的 401 状态码响应后，把首部字段 Authorization 加入请求中。共用缓存在接收到含有 Authorization 首部字段的请求时的操作处理会略有差异
+
+### Expect
+
+Expect: 100-continue
+
+告知服务器，期望出现的某种特定行为。因服务器无法理解客户端的期望作出回应而发生错误时，会返回状态码 417 Expectation Failed
+
+### From
+
+用来告知服务器使用用户代理的用户的电子邮件地址。通常，其使用目的就是为了显示搜索引擎等用户代理的负责人的电子邮件联系方式。使用代理时，应尽可能包含 From 首部字段（但可能会因代理不同，将电子邮件地址记录在 User-Agent 首部字段内
+
+### Host
+
+告知服务器，请求的资源所处的互联网主机名和端口号。Host 首部字段在 HTTP/1.1 规范内是唯一一个必须被包含在请求内的首部字段
+
+### If-Match
+
+If-Match: "123456"
+
+形如 If-xxx 这种样式的请求首部字段，都可称为条件请求。服务器接收到附带条件的请求后，只有判断指定条件为真时，才会执行请求
+
+### If-Modified-Since
+
+If-Modified-Since: Thu, 15 Apr 2004 00:00:00 GMT
+
+会告知服务器若 If-Modified-Since 字段值早于资源的更新时间，则希望能处理该请求。而在指定 If-Modified-Since 字段值的日期时间之后，如果请求的资源都没有过更新，则返回状态码 304 Not Modified 的响应
+
+### If-None-Match
+
+首部字段 If-None-Match 属于附带条件之一。它和首部字段 If-Match 作用相反。用于指定 If-None-Match 字段值的实体标记（ETag）值与请求资源的 ETag 不一致时，它就告知服务器处理该请求
+
+### If-Range
+
+它告知服务器若指定的 If-Range 字段值（ETag 值或者时间）和请求资源的 ETag 值或时间相一致时，则作为范围请求处理。反之，则返回全体资源
+
+### If-Unmodified-Since
+
+If-Unmodified-Since: Thu, 03 Jul 2012 00:00:00 GMT
+
+作用的是告知服务器，指定的请求资源只有在字段值内指定的日期时间之后，未发生更新的情况下，才能处理请求。如果在指定日期时间后发生了更新，则以状态码 412 Precondition Failed 作为响应返回
+
+### Max-Forwards
+
+Max-Forwards: 10
+
+每次转发数值减 1。当数值变 0 时返回响应
+
+服务器在往下一个服务器转发请求之前，Max-Forwards 的值减1 后重新赋值。当服务器接收到 Max-Forwards 值为 0 的请求时，则不再进行转发，而是直接返回响应
+
+### Proxy-Authorization
+
+Proxy-Authorization: Basic dGlwOjkpNLAGfFY5
+
+接收到从代理服务器发来的认证质询时，客户端会发送包含首部字段 Proxy-Authorization 的请求，以告知服务器认证所需要的信息
+
+### Range
+
+对于只需获取部分资源的范围请求，包含首部字段 Range 即可告知服务器资源的指定范围。上面的示例表示请求获取从第 5001 字节至第 10000 字节的资源。
+接收到附带 Range 首部字段请求的服务器，会在处理请求之后返回状态码为 206 Partial Content 的响应。无法处理该范围请求时，则会返回状态码 200 OK 的响应及全部资源
+
+### Referer
+
+Referer: http://www.hackr.jp/index.htm
+
+知服务器请求的原始资源的 URI
+
+### TE
+
+#### TE: gzip, deflate;q=0.5
+
+首部字段 TE 会告知服务器客户端能够处理响应的传输编码方式及相对优先级
+
+### User-Agent
+
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:13.0) Gecko/20100101 Firefox/13.0.1
+
+创建请求的浏览器和用户代理名称等信息传达给服务器
+
+## 响应首部字段
+
+由服务器端向客户端返回响应报文中所使用的字段，用于补充响应的附加信息、服务器信息，以及对客户端的附加要求等信息
+
+### Accept-Ranges
+
+Accept-Ranges: bytes
+
+用来告知客户端服务器是否能处理范围请求，以指定获取服务器端某个部分的资源；
+
+可指定的字段值有两种，可处理范围请求时指定其为 bytes，反之则指定其为 none
+
+### Age
+
+Age: 600
+
+告知客户端，源服务器在多久前创建了响应。字段值的单位为秒
+
+### ETag
+
+ETag: "82e22293907ce725faf67773957acd12"
+
+知客户端实体标识。它是一种可将资源以字符串形式做唯一性标识的方式。服务器会为每份资源分配对应的 ETag 值。
+另外，当资源更新时，ETag 值也需要更新。生成 ETag 值时，并没有统一的算法规则，而仅仅是由服务器来分配
+
+### Location
+
+将响应接收方引导至某个与请求 URI 位置不同的资源。
+基本上，该字段会配合 3xx ：Redirection 的响应，提供重定向的 URI
+
+### Proxy-Authenticate
+
+Proxy-Authenticate: Basic realm="Usagidesign Auth"
+
+把由代理服务器所要求的认证信息发送给客户端。
+它与客户端和服务器之间的 HTTP 访问认证的行为相似，不同之处在于其认证行为是在客户端与代理之间进行
+
+### Retry-After
+
+Retry-After: 120
+
+告知客户端应该在多久之后再次发送请求。主要配合状态码 503 Service Unavailable 响应，或 3xx Redirect 响应一起使用
+
+### Server
+
+Server: Apache/2.2.17 (Unix)
+
+告知客户端当前服务器上安装的 HTTP 服务器应用程序的信息。不单单会标出服务器上的软件应用名称，还有可能包括版本号和安装时启用的可选项
+
+### Vary
+
+Vary: Accept-Language
+
+当代理服务器接收到带有 Vary 首部字段指定获取资源的请求时，如果使用的 Accept-Language 字段的值相同，那么就直接从缓存返回响应。反之，则需要先从源服务器端获取资源后才能作为响应返回
+
+### WWW-Authenticate
+
+WWW-Authenticate: Basic realm="Usagidesign Auth"
+
+于 HTTP 访问认证。它会告知客户端适用于访问请求 URI 所指定资源的认证方案（Basic 或是 Digest）和带参数提示的质询（challenge）。状态码 401 Unauthorized 响应中，肯定带有首部字段 WWW-Authenticate
+
+## 实体首部字段
+
+包含在请求报文和响应报文中的实体部分所使用的首部，用于补充内容的更新时间等与实体相关的信息。
+
+### Allow
+
+Allow: GET, HEAD
+
+通知客户端能够支持 Request-URI 指定资源的所有 HTTP 方法。当服务器接收到不支持的 HTTP 方法时，会以状态码 405 Method Not Allowed 作为响应返回。与此同时，还会把所有能支持的 HTTP 方法写入首部字段 Allow 后返回
+
+### Content-Encoding
+
+Content-Encoding: gzip
+
+告知客户端服务器对实体的主体部分选用的内容编码方式。内容编码是指在不丢失实体信息的前提下所进行的压缩
+
+### Content-Language
+
+Content-Language: zh-CN
+
+告知客户端，实体主体使用的自然语言（指中文或英文等语言）
+
+### Content-Length
+
+Content-Length: 15000
+
+表明了实体主体部分的大小（单位是字节）。对实体主体进行内容编码传输时，不能再使用 Content-Length 首部字段
+
+### Content-Location
+
+Content-Location: http://www.hackr.jp/index-ja.html
+
+给出与报文主体部分相对应的 URI。和首部字段 Location 不同，Content-Location 表示的是报文主体返回资源对应的 URI
+
+### Content-MD5
+
+Content-MD5: OGFkZDUwNGVhNGY3N2MxMDIwZmQ4NTBmY2IyTY==
+
+客户端会对接收的报文主体执行相同的 MD5 算法，然后与首部字段 Content-MD5 的字段值比较
+
+是一串由 MD5 算法生成的值，其目的在于检查报文主体在传输过程中是否保持完整，以及确认传输到达
+
+### Content-Range
+
+Content-Range: bytes 5001-10000/10000
+
+针对范围请求，返回响应时使用的首部字段 Content-Range，能告知客户端作为响应返回的实体的哪个部分符合范围请求。字段值以字节为单位，表示当前发送部分及整个实体大小
+
+### Content-Type
+
+Content-Type: text/html; charset=UTF-8
+
+说明了实体主体内对象的媒体类型。和首部字段 Accept 一样，字段值用 type/subtype 形式赋值
+
+### Expires
+
+Expires: Wed, 04 Jul 2012 08:26:05 GMT
+
+将资源失效的日期告知客户端
+
+### Last-Modified
+
+Last-Modified: Wed, 23 May 2012 09:59:55 GMT
+
+指明资源最终修改的时间
