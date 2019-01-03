@@ -838,6 +838,14 @@ HTTP 要传送一条报文时，会以流的形式将报文数据的内容通过
 
 ![image](https://github.com/NoahsDante/webNotes/blob/master/http/img/10.png)
 
+## 负责域名解析的DNS服务
+
+提供域名到IP地址之间的解析服务;
+
+![image](https://github.com/NoahsDante/webNotes/blob/master/http/img/11.png)
+
+
+
 
 
 
