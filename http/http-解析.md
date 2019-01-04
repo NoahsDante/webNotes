@@ -878,5 +878,7 @@ HTTP **允许客户端打开多条连接，并行地执行多个 HTTP 事务**;
 
 ![image](https://github.com/NoahsDante/webNotes/blob/master/http/img/12.png)
 
+# 网关、隧道及中继
+
 
 
