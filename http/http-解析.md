@@ -1034,5 +1034,11 @@ HTTPS并非是应用层的一种新协议,**只是HTTP通信接口部分用SSL�
 
 这是不加密处理的,**由于明文解码后就是用户ID和密码,在HTTP等非加密通信的线路上进行BASIC认证过程中,如果被人窃听,被盗的可能性极高;**还有想再进行一次BASIC认证时,一般浏览器却无法实现认证注销操作;BASIC认证使用上不够便捷灵活,且达不到多数web网站期望的安全性等级,**因此它并不经常使用**
 
+### DIGEST认证
 
+为了弥补BASIC认证存在的弱点,从HTTP/1.1就有了DIGEST认证.同样使用质询/响应的方式,但不会直接发送明文密码
+
+1. 请求需认证的资源时,服务器会随着状态码401,返回WWW-Authenticate首部字段的响应.该字段内包含质问响应方式认证所需的临时质询码;首部字段WWW-Authenticate内必须包含realm和nonce这两个字段信息;客户端就是依靠向服务器回送这两个值进行认证
+2. 接收到401状态码的客户端,返回的响应中包含DIGEST认证必须的首部字段Authorization信息;首部字段Authorization内必须包含username、realm、nonce、uri和response的字段信息.
+3. 接收到包含首部字段Authorization请求的服务器,会确认认证信息的正确性.认证通过后则返回包含Request-URL资源的响应;并且这时会在首部字段Authentication-Info 写入一些认证成功的相关信息;
 
