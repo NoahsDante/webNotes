@@ -1042,3 +1042,9 @@ HTTPS并非是应用层的一种新协议,**只是HTTP通信接口部分用SSL�
 2. 接收到401状态码的客户端,返回的响应中包含DIGEST认证必须的首部字段Authorization信息;首部字段Authorization内必须包含username、realm、nonce、uri和response的字段信息.
 3. 接收到包含首部字段Authorization请求的服务器,会确认认证信息的正确性.认证通过后则返回包含Request-URL资源的响应;并且这时会在首部字段Authentication-Info 写入一些认证成功的相关信息;
 
+DIGEST认证提供防止密码被窃听的保护机制,但并不存在防止用户伪装的保护机制,DIGEST认证和BASIC认证一样,使用上不是很便捷灵活
+
+### SSL客户端认证
+
+
+
