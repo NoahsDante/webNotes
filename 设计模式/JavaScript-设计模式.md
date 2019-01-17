@@ -182,6 +182,10 @@ var getSingle = function() {
 
 # 抽象工厂模式
 
+## 定义
+
+提供一个创建一系列相关或相互依赖对象的接口，而无须指定它们具体的类
+
 ## 抽象类
 
 **强调子类继承父类时,必须子类覆盖父类定义的方法,否则提示报错**
@@ -196,4 +200,68 @@ car.prototype = {
     }
 };
 ```
+
+## 示例
+
+```javascript
+var VehicleFactory = function(subType, superType){
+        // 判断抽象工厂中是否有该抽象类
+        if(typeof VehicleFactory[superType] === 'function'){
+          // 缓存类
+          function F(){}；
+          // 继承父类属性和方法
+          F.prototype = new VehicleFactory[superType]()；
+          // 将子类constructor指向子类
+          subType.constructor = subType；
+          // 子类原型继承“父类”
+          subType.prototype = new F()；
+        }else{
+          // 不存在该抽象类抛出错误
+          throw new Error('未创建该抽象类')；
+        }
+    }
+    // 小汽车抽象类
+    VehicleFactory.car = function(){
+        this.type = 'car'；
+    }；
+    VehicleFactory.car.prototype = {
+        getPrice ： function(){
+          return new Error('抽象方法不能调用')；
+        },
+        getspeed ： function(){
+          return new Error('抽象方法不能调用')；
+        }
+    }；
+// 宝马汽车子类
+    var BMW = function(price, speed){
+        this.price = price；
+        this.speed = speed；
+    }
+    // 抽象工厂实现对car抽象类的继承
+    VehicleFactory(BMW, 'car')；
+    BMW.prototype.getPrice = function(){
+        return this.price；
+    }
+    BMW.prototype.getspeed = function(){
+        return this.speed；
+    }
+```
+
+抽象工厂其实是一个实现**子类继承父类的方法**，
+
+继承父类过程中有一个地方需要注意，通过 **new 关键字复制的父类的一个实例**
+
+## 优点
+
+- 封装性,抽象工厂模式隔离了具体类的生成，使得客户并不需要知道什么被创建
+
+## 缺点
+
+- 难以扩展抽象工厂来生产新种类的产品，**这是因为在抽象工厂角色中规定了所有可能被创建的产品集合**，要支持新种**类的产品就意味着要对该接口进行扩展，而这将涉及到对抽象工厂角色及其所有子类的修改**，显然会带来较大的不便
+
+## 实践
+
+- 在很多软件系统中需要更换界面主题，
+
+- 涉及不同操作系统的时候
 
