@@ -192,60 +192,6 @@ var getSingle = function() {
 
 因为在一些大型应用中，总会有一些子类去继承另一些父类;那么一旦用子类创建了一个对象，该对象总是应该具备一些必要的方法，但如果这些必要的方法从父类中继承过来而没有具体去重写实现，那么实例化对象便会调用父类中的这些方法，如果父类能有一个友好提示，那么对于忘记重写子类的这些错误遗漏的避免是很有帮助.
 
-```javascript
-var car = function() {};
-car.prototype = {
-    a:function() {
-        return new Error('抽象方法不能调用');
-    }
-};
-```
-
-## 示例
-
-```javascript
-var VehicleFactory = function(subType, superType){
-        // 判断抽象工厂中是否有该抽象类
-        if(typeof VehicleFactory[superType] === 'function'){
-          // 缓存类
-          function F(){}；
-          // 继承父类属性和方法
-          F.prototype = new VehicleFactory[superType]()；
-          // 将子类constructor指向子类
-          subType.constructor = subType；
-          // 子类原型继承“父类”
-          subType.prototype = new F()；
-        }else{
-          // 不存在该抽象类抛出错误
-          throw new Error('未创建该抽象类')；
-        }
-    }
-    // 小汽车抽象类
-    VehicleFactory.car = function(){
-        this.type = 'car'；
-    }；
-    VehicleFactory.car.prototype = {
-        getPrice ： function(){
-          return new Error('抽象方法不能调用')；
-        },
-        getspeed ： function(){
-          return new Error('抽象方法不能调用')；
-        }
-    }；
-// 宝马汽车子类
-    var BMW = function(price, speed){
-        this.price = price；
-        this.speed = speed；
-    }
-    // 抽象工厂实现对car抽象类的继承
-    VehicleFactory(BMW, 'car')；
-    BMW.prototype.getPrice = function(){
-        return this.price；
-    }
-    BMW.prototype.getspeed = function(){
-        return this.speed；
-    }
-```
 
 抽象工厂其实是一个实现**子类继承父类的方法**，
 
@@ -300,3 +246,8 @@ var VehicleFactory = function(subType, superType){
 ## 缺点
 
 由于原型对象是一个共享对象，既然被共享，那么对原型对象的拓展，不论是子类或者父类的实例对象都会继承下来;所以不要随意去做，否则如果修改类的其他属性或者方法很有可能会影响到他人
+
+## 实践
+
+当然不同的子类之间可能存在不同的结构样式;应该抽象出一个基类，让不同特效类去继承这个基类，然后对于差异化的需求通过重写这些继承下来的属性或者方法来解决
+
