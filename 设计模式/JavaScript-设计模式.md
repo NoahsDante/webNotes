@@ -251,3 +251,51 @@ var getSingle = function() {
 
 当然不同的子类之间可能存在不同的结构样式;应该抽象出一个基类，让不同特效类去继承这个基类，然后对于差异化的需求通过重写这些继承下来的属性或者方法来解决
 
+# 外观模式
+
+## 定义
+
+为一组复杂的子系统接口提供一个更高级的统一接口,通过这个接口是的对子系统接口的访问更容易
+
+## 优点
+
+- 对客户屏蔽子系统组件，减少了客户处理的对象数目并使得子系统使用起来更加容易
+- 实现了子系统与客户之间的松耦合关系，这使得子系统的组件变化不会影响到调用它的客户类，只需要调整外观类即可
+
+## 缺点
+
+- 不能很好地限制客户使用子系统类，如果对客户访问子系统类做太多的限制则减少了可变性和灵活性
+- 在不引入抽象外观类的情况下，增加新的子系统可能需要修改外观类或客户端的源代码
+
+## 实践
+
+- 要为一个复杂子系统提供一个简单接口；
+- 客户程序与多个子系统之间存在很大的依赖性；
+- 在层次化结构中，需要定义系统中每一层的入口，使得层与层之间不直接产生联系。
+- **不要试图通过外观类为子系统增加新行为**
+  - 观模式的用意是为子系统提供一个集中化和简化的沟通渠道，而不是向子系统加入新的行为，新的行为的增加应该通过修改原有子系统类或增加新的子系统类来实现，不能通过外观类来实现
+
+```javascript
+// 外观模式实现
+    function addEvent(dom, type, fn){
+        // 对于支持DoM2级事件处理程序addEventListener方法的浏览器
+        if(dom.addEventListener){
+          dom.addEventListener(type, fn, false)；
+        // 对于不支持addEventListener方法但支持attachEvent方法的浏览器
+        }else if(dom.attachEvent){
+          dom.attachEvent('on' + type, fn)；
+        // 对于不支持addEventListener方法也不支持attachEvent方法，但支持on+'事件名'的
+    浏览器
+        }else{
+          dom['on' + type] = fn；
+        }
+    }
+var myInput = document.getElementById('myinput')；
+    addEvent(myInput, 'click', function(){
+        console.log("绑定第—个事件")
+    })
+    addEvent(myInput, 'click', function(){
+        console.log("绑定第二个事件")
+    })
+```
+
