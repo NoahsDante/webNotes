@@ -347,5 +347,48 @@ function dosomeThing(obj){
     }
 ```
 
+# 代理模式
 
+## 定义
+
+**一个客户端不想或者不能直接引用一个对象时**,此时可以通过一个称之为“代理”的第三者来实现 间接引用。代理对象可以在客户端和目标对象之间起到中介的作用，**并且可以通过代理对象去掉客户不能看到的内容和服务或者添加客户需要的额外服务**
+
+## 优点
+
+- 代理模式能够协调调用者和被调用者，在一定程度上降低了系 统的耦合度。
+- 代理和本体接口的一致性
+  - 用户可以放心地请求代理，他只关心是否能得到想要的结果
+  - 在任何使用本体的地方都可以替换成使用代理
+
+## 缺点
+
+- 由于在客户端和真实主题之间增加了代理对象，因此 有些类型的代理模式可能会造成请求的处理速度变慢。
+- 实现代理模式需要额外的工作，有些代理模式的实现 非常复杂
+
+## 实践
+
+1. **远程代理**，也就是为了一个对象在不同的地址空间提供局部代表，这样可以隐藏一个对象存在于不同地址空间的事实，就像web service里的代理类一样。
+2. **虚拟代理**，根据需要创建开销很大的对象，通过它来存放实例化需要很长时间的真实对象，比如浏览器的渲染的时候先显示问题，而图片可以慢慢显示（就是通过虚拟代理代替了真实的图片，此时虚拟代理保存了真实图片的路径和尺寸。
+3. **安全代理**，用来控制真实对象访问时的权限，一般用于对象应该有不同的访问权限。
+4. **智能指引**，只当调用真实的对象时，代理处理另外一些事情
+
+```javascript
+var myImage = (function(){
+var imgNode = document.createElement( 'img' ); document.body.appendChild( imgNode );
+    return {
+        setSrc: function( src ){
+        imgNode.src = src; 
+    }
+} })();
+var proxyImage = (function(){ var img = new Image; img.onload = function(){
+    myImage.setSrc( this.src ); }
+    return {
+        setSrc: function( src ){
+        myImage.setSrc( 'file:// /C:/Users/svenzeng/Desktop/loading.gif' );
+   		img.src = src; 
+    }
+} })();
+proxyImage.setSrc( 'http:// imgcache.qq.com/music/photo/k/000GGDys0yA0Nk.jpg' );
+
+```
 
