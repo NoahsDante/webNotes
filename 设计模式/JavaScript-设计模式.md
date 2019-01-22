@@ -419,7 +419,7 @@ proxyImage.setSrc( 'http:// imgcache.qq.com/music/photo/k/000GGDys0yA0Nk.jpg' );
 
 ## 定义
 
-抽象部分与它的实现部分分离，使它们都可以独立地变化;又称为柄体(Handle and Body)模式或接口(Interface)模式
+**抽象部分与它的实现部分分离，使它们都可以独立地变化**;又称为柄体(Handle and Body)模式或接口(Interface)模式
 
 ## 优点
 
@@ -431,7 +431,11 @@ proxyImage.setSrc( 'http:// imgcache.qq.com/music/photo/k/000GGDys0yA0Nk.jpg' );
 
 ## 实践
 
-```
+- 一个适用场景是组件开发。我们平时开发组件为了适应不同场合，组件相应的会有许多不同维度的变化
+- 一个类存在两个独立变化的维度，且这两个维度都需要进行扩展
+- 设计要求需要独立管理抽象化角色和具体化角色；不希望使用继承或因为多层次继承导致系统类的个数急剧增加的系统
+
+```javascript
 var each = function (arr, fn) {
     for (var i = 0; i < arr.length; i++) {
         var val = arr[i];
