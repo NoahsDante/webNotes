@@ -415,6 +415,41 @@ proxyImage.setSrc( 'http:// imgcache.qq.com/music/photo/k/000GGDys0yA0Nk.jpg' );
 - 需要动态地给一个对象增加功能，这些功能可以再动态地撤销
 -  需要为一批的兄弟类进行改装或加装功能
 
+# 桥接模式
+
+## 定义
+
+抽象部分与它的实现部分分离，使它们都可以独立地变化;又称为柄体(Handle and Body)模式或接口(Interface)模式
+
+## 优点
+
+- 分离抽象接口及其实现部分，是比多继承方案更好的解决方法，桥接模式还提高了系统的可扩充性，在两个变化维度中任意扩展一个维度，都不需要修改原有系统，实现细节对客户透明，可以对用户隐藏实现细节
+
+## 缺点
+
+- 增加系统的理解与设计难度，且识别出系统中两个独立变化的维度并不是一件容易的事情
+
+## 实践
+
+```
+var each = function (arr, fn) {
+    for (var i = 0; i < arr.length; i++) {
+        var val = arr[i];
+        if (fn.call(val, i, val, arr)) {
+            return false;
+        }
+    }
+}
+var arr = [1, 2, 3, 4];
+each(arr, function (i, v) {
+    arr[i] = v * 2;
+})
+```
+
+
+
+
+
 
 
 
