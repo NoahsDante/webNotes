@@ -450,7 +450,56 @@ each(arr, function (i, v) {
 })
 ```
 
+# 组合模式
 
+## 定义
+
+**同时处理简单对象和由简单对象组成的复杂对象，这些简单对象和复杂对象会组合成树形结构**，**在客户端对其处理的时候要保持一致性**。比如电商网站中的产品订单，每一张产品订单可能有多个子订单组合，比如操作系统的文件夹，每个文件夹有多个子文件夹或文件，我们作为用户对其进行复制，删除等操作时，不管是文件夹还是文件，对我们操作者来说是一样
+
+## 优点
+
+- 高层模块调用简单。局部和整体对调用者来说没有任何区别，也就是说，高层模块不必关心自己处理的是单个对象还是整个组合结构，简化了高层模块的代码
+
+-  节点自由增加。使用了组合模式后，我们可以看看，如果想增加一个树枝节点、树叶节点十分简单，只要找到它的父节点就成，非常容易扩展，符合开闭原则，对以后的维护非常有利
+
+## 缺点
+
+- 系统中的每个对象看起来都 与其他对象差不多。它们的区别只有在运行的时候会才会显现出来，这会使代码难以理解。
+-  如果通过组合模式创建了太多的对象，那么这些对象可能会让系统负担不起 
+
+## 实践
+
+- 示对象的部分整体层次结构 
+- 客户希望统一对待树中的所有对象 
+
+```javascript
+function FlightOrder() { }
+FlightOrder.prototyp.create = function () {
+    console.log("flight order created");
+}
+function HotelOrder() { }
+HotelOrder.prototype.create = function () {
+    console.log("hotel order created");
+}
+function TotalOrders() {
+    this.orderList = [];
+}
+TotalOrders.prototype.addOrder = function (order) {
+    this.orderList.push(order);
+}
+TotalOrders.prototype.create = function (order) {
+    for (var i = 0, length = this.orderList.length; i < length; i++) {
+        this.orderList[i].create();
+    }
+}
+var flight = new FlightOrder();
+flight.create();
+
+var orders = new TotalOrders();
+orders.addOrder(new FlightOrder());
+orders.addOrder(new HotelOrder());
+orders.create();
+```
 
 
 
