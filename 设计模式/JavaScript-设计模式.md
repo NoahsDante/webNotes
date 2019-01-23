@@ -501,7 +501,72 @@ orders.addOrder(new HotelOrder());
 orders.create();
 ```
 
+# 享元模式
 
+## 定义
+
+运用**共享技术有效地支持大量的细粒度的对象，避免对象间拥有相同内容造成多余的开销**
+
+## 优点
+
+- 它可以极大减少内存中对象的数量，使得相同对象或相似对象在内存中只保存一份。
+- 外部状态相对独立，而且不会影响其内部状态，从而使得享元对象可以在不同的环境中被共享
+
+## 缺点
+
+- 使得系统更加复杂，需要分离出内部状态和外部状态，这使得程序的逻辑复杂化。
+- 为了使对象可以共享，享元模式需要将享元对象的状态外部化，而读取外部状态使得运行时间变长。
+
+## 实践
+
+- 一个系统有大量相同或者相似的对象，由于这类对象的大量使用，造成内存的大量耗费。
+- 对象的大部分状态都可以外部化，可以将这些外部状态传入对象中。
+- 使用享元模式需要维护一个存储享元对象的享元池，而这需要耗费资源，因此，应当在多次重复使用享元对象时才值得使用享元模式
+- 在中央事件管理器上用来避免给父容器里的每个子元素都附加事件句柄
+
+```javascript
+const Model = function(gender) {
+  this.gender = gender
+}
+Model.prototype.takephoto = function() {
+  console.log(`${this.gender}穿着${this.underwear}`)
+}
+const modelFactory = (function() { // 优化第一点
+  const modelGender = {}
+  return {
+    createModel: function(gender) {
+      if (modelGender[gender]) {
+        return modelGender[gender]
+      }
+      return modelGender[gender] = new Model(gender)
+    }
+  }
+}())
+const modelManager = (function() {
+  const modelObj = {}
+  return {
+    add: function(gender, i) {
+      modelObj[i] = {
+        underwear: `第${i}款衣服`
+      }
+      return modelFactory.createModel(gender)
+    },
+    copy: function(model, i) { // 优化第二点\
+      model.underwear = modelObj[i].underwear
+    }
+  }
+}())
+for (let i = 1; i < 51; i++) {
+  const maleModel = modelManager.add('male', i)
+  modelManager.copy(maleModel, i)
+  maleModel.takephoto()
+}
+for (let i = 1; i < 51; i++) {
+  const femaleModel = modelManager.add('female', i)
+  modelManager.copy(femaleModel, i)
+  femaleModel.takephoto()
+}
+```
 
 
 
