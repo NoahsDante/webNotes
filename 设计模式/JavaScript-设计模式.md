@@ -64,7 +64,7 @@
 
 ## 里氏替换
 
-通常使用继承来实现.
+通常使用**继承**来实现.
 
 **子类可以扩展父类的功能，但不能改变父类原有的功能**
 
@@ -327,8 +327,7 @@ function arrToobjAdapter(arr){
         }
     }
     var adapterData = arrToobjAdapter(arr)；
-    console.log(adapterData)    // {name： "Javascript", type： "book", title： "前
-    段编程语言", data： "8月1日"}
+    console.log(adapterData)    // {name： "Javascript", type： "book", title： "前段编程语言", data"8月1日"}
 
 function dosomeThing(obj){
         var _adapter = {
@@ -459,8 +458,7 @@ each(arr, function (i, v) {
 ## 优点
 
 - 高层模块调用简单。局部和整体对调用者来说没有任何区别，也就是说，高层模块不必关心自己处理的是单个对象还是整个组合结构，简化了高层模块的代码
-
--  节点自由增加。使用了组合模式后，我们可以看看，如果想增加一个树枝节点、树叶节点十分简单，只要找到它的父节点就成，非常容易扩展，符合开闭原则，对以后的维护非常有利
+- 节点自由增加。使用了组合模式后，我们可以看看，如果想增加一个树枝节点、树叶节点十分简单，只要找到它的父节点就成，非常容易扩展，符合开闭原则，对以后的维护非常有利
 
 ## 缺点
 
@@ -469,7 +467,7 @@ each(arr, function (i, v) {
 
 ## 实践
 
-- 示对象的部分整体层次结构 
+- 表示对象的部分整体层次结构 
 - 客户希望统一对待树中的所有对象 
 
 ```javascript
@@ -608,7 +606,15 @@ for (let i = 1; i < 51; i++) {
 
 ## 实践
 
+# 职责模式
 
+## 定义
+
+## 优点
+
+## 缺点
+
+## 实践
 
 
 
