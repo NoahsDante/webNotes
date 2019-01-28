@@ -570,11 +570,79 @@ for (let i = 1; i < 51; i++) {
 
 ## 定义
 
+**父类定义一组可操作算饭骨架,而将一些实现步骤延迟到子类中**,使得在子类中可以改变父类的算法结构同时可以重新定义算法中某些实现的步骤;
+
+核心在于**对方法的重用，它将核心方法封装在基类中，让子类继承基类的方法，实现基类方法的共享，达到方法共用**
+
 ## 优点
+
+- 封装不变部分,扩展变的部分
+- 提取公共代码,便于维护
+- 行为由父类控制,子类实现
 
 ## 缺点
 
+- 每个不同的实现都需要子类完成,导致类数量的增加,增加系统复杂度
+
 ## 实践
+
+```javascript
+// 格式化字符串方法
+    function formatestring(str, data){
+        return  str.replace(/\{#(\w+)#\}/g,  function(match,  key){return  typeof
+            data[key] === undefined ? '' ： data[key]})；
+    }
+    // 基础导航
+    var Nav = function(data){
+        // 基础导航样式模板
+        this.item = '＜a href="{#href#}" title="{#title#}"＞{#name#}＜/a＞'；
+        // 创建字符串
+        this.html = ''；
+        // 格式化数据
+        for(var i = 0, len = data.length； i ＜ len； i++){
+          this.html += formatestring(this.item, data[i])；
+        }
+        // 返回字符串数据
+        return this.html；
+    }
+    // 带有消息提醒信息导航
+    var NumNav = function(data){
+        // 消息提醒信息组件模板
+        var tpl = '＜b＞{#num#}＜/b＞'；
+        // 装饰数据
+        for(var i = data.length - 1； i ＞= 0； i--){
+          data[i].name += data[i].name + formatestring(tpl, data[i])；
+        }
+        // 继承基础导航类，并返回字符串
+        return Nav.call(this, data)；
+    }
+    
+    // 获取导航容器
+    var nav = document.getElementById('content')；
+    // 添加内容
+    nav.innerHTML = NumNav([
+        {
+          href ： 'http：//www.baidu.com/',
+          title ： '百度—下，你就知道',
+          name ： '百度',
+          num ： '10'
+        },
+        {
+          href ： 'http：//www.taobao.com/',
+          title ： '淘宝商城',
+          name ： '淘宝',
+          num ： '2'
+        },
+        {
+          href ： 'http：//www.qq.com/',
+          title ： '腾讯首页',
+          name ： '腾讯',
+          num ： '3'
+        }
+    ])
+```
+
+
 
 # 观察者模式
 
