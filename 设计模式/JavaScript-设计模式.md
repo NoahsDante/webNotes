@@ -841,27 +841,48 @@ for (let i = 1; i < 51; i++) {
     }()；
 ```
 
-
-
-# 职责模式
-
-## 定义
-
-## 优点
-
-## 缺点
-
-## 实践
-
 # 命令模式
 
 ## 定义
 
+**将请求与实现解耦并封装成一个独立对象,从而使不同请求对客户端实现参数化**
+
 ## 优点
+
+- 降低了系统耦合度。 
+- 新的命令可以很容易添加到系统中去。
 
 ## 缺点
 
+- 使用命令模式可能会导致某些系统有过多的具体命令类
+
 ## 实践
+
+```javascript
+// 模块实现模块
+    var viewcommand = (function(){
+    // 方法集合
+    var Action = {
+          // 创建方法
+          create ： function(){},
+          // 展示方法
+          display ： function(){}
+        }
+        // 命令接口
+       return function excute(msg){
+        	// 解析命令，如果msg.param不是数组则将其转化为数组（apply方法要求第二个参数为数组）
+        msg.param=object.prototype.tostring.call(msg.param)==="[object Array]"? msg.param ： [msg.param]；
+        // Action内部调用的方法引用this，所以此处为保证作用域this执行传入Action
+        Action[msg.command].apply(Action, msg.param)
+    	}
+    })()；
+    viewcommand({
+        // 参数说明 方法 display
+        command ： 'display',
+        // 参数说明 param1 元素容器 param2 标题数据 param3 元素模板 详见display方法
+        param ： ['title', titleData, 'title']
+    })；
+```
 
 # 访问者模式
 
