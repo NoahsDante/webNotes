@@ -915,8 +915,8 @@ Visitor .push  =  function(){
     return Array.prototype.push.apply( this, arguments );
 }
 var obj = {};
-obj.push = Visitor .push;
-obj.push( '"first" );
+obj.push = Visitor.push;
+obj.push( "first" );
 alert ( obj[0] )  //"first"
 alert ( obj.length );  //1
 ```
