@@ -888,11 +888,35 @@ for (let i = 1; i < 51; i++) {
 
 ## 定义
 
+**是表示一个作用于某个对象结构中的各元素的操作。它使可以在不改变各元素的类的前提下定义作用于这些元素的新操作;**
+
+我们可以将每一个类中的相关操作提取出来，包装成一个独立的对象，这个对象我们就称为访问者（Visitor）。利用访问者，对访问的元素进行某些操作时，只需将此对象作为参数传递给当前访问者，然后，访问者会依据被访问者的具体信息，进行相关的操作
+
+访问者模式先把一些可复用的行为抽象到一个函数(对象)里，这个函数我们就称为访问者（Visitor）。如果另外一些对象要调用这个函数，只需要把那些对象当作参数传给这个函数，在js里我们经常通过call或者apply的方式传递this对象给一个Visitor函数.
+
 ## 优点
+
+- 降低了系统耦合度。 
 
 ## 缺点
 
+- 增加了系统的复杂性
+
 ## 实践
+
+```javascript
+var Visitor = {}
+Visitor .push  =  function(){
+    return Array.prototype.push.apply( this, arguments );
+}
+var obj = {};
+obj.push = Visitor .push;
+obj.push( '"first" );
+alert ( obj[0] )  //"first"
+alert ( obj.length );  //1
+```
+
+
 
 # 中介模式
 
