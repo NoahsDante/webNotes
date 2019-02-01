@@ -1074,15 +1074,3 @@ arr.eachPlus(function(value, index) {
     console.log(value, index);
 })
 ```
-
-
-
-# 解释器模式
-
-## 定义
-
-## 优点
-
-## 缺点
-
-## 实践
