@@ -1047,11 +1047,35 @@ alert ( obj.length );  //1
 
 ## 定义
 
+**在不暴露对象内部结构的同时，可以顺序地访问聚合对象内部的元素**
+
 ## 优点
+
+- 它支持以不同的方式遍历一个聚合对象。
+- 迭代器简化了聚合类
+- 在同一个聚合上可以有多个遍历
+- 在迭代器模式中，增加新的聚合类和迭代器类都很方便，无须修改原有代码。
 
 ## 缺点
 
+- 由于迭代器模式将存储数据和遍历数据的职责分离，增加新的聚合类需要对应增加新的迭代器类，类的个数成对增加，这在一定程度上增加了系统的复杂性
+
 ## 实践
+
+```javascript
+Array.prototype.eachPlus = function(callback) {
+    var self = this;
+    for(var i = 0; i < self.length; i++) {
+        callback(self[i], i, self);
+    }
+}
+var arr = [1, 2, 3];
+arr.eachPlus(function(value, index) {
+    console.log(value, index);
+})
+```
+
+
 
 # 解释器模式
 
