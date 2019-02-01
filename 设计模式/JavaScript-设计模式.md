@@ -984,10 +984,6 @@ alert ( obj.length );  //1
     }()；
 ```
 
-
-
-
-
 # 备忘录模式
 
 ## 定义
@@ -996,9 +992,56 @@ alert ( obj.length );  //1
 
 ## 优点
 
+- 给用户提供了一种可以恢复状态的机制，可以使用户能够比较方便地回到某个历史的状态。
+- 实现了信息的封装，使得用户不需要关心状态的保存细节
+
 ## 缺点
 
+- 消耗资源。如果类的成员变量过多，势必会占用比较大的资源，而且每一次保存都会消耗一定的内存
+
 ## 实践
+
+```javascript
+// Page备忘录类
+    var Page = function(){
+        // 信息缓存对象
+        var cache = {}；
+        /＊＊＊
+        ＊ 主函数
+        ＊ 参数 page 页码
+        ＊ 参数 fn  成功回调函数
+        ＊＊/
+       return function(page, fn){
+          // 判断该页数据是否在缓存中
+          if (cache[page]) {
+              // 恢复到该页状态，显示该页内容
+              showPage(page, cache[page])；
+              // 执行成功回调函数
+              fn && fn()；
+          }else{
+              // 若缓存cache中无该页数据
+              $.post('./data/getNewsData.php', {
+                  // 请求携带数据 page 页码
+                  page ： page
+              }, function(res){
+                  // 成功返回
+                  if(res.errNo == 0){
+                      // 显示该页数据
+                      showPage(page, res.data)；
+                      // 将该页数据种入缓存中
+                      cache[page] = res.data；
+                      // 执行成功回调函数
+                      fn && fn()；
+                  }else{
+                      // 处理异常
+                  }
+              })
+          }
+       }
+    }()
+```
+
+
 
 # 迭代器模式
 
