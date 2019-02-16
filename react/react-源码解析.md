@@ -1,4 +1,4 @@
-# 首次渲染（简单组件）
+# 首次渲染（组件）
 
 ## React.createElement()
 
