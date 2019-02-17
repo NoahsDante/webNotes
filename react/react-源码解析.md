@@ -45,7 +45,7 @@ ReactDOM.render(
 );
 ```
 
-调用栈是
+**调用栈是**
 
 ```javascript
 React.createElement => createElement => ReactElement return element; 
@@ -181,20 +181,40 @@ function createElement(type, config, children) {
       }
     }
   }
-  {
-    if (key || ref) {
-      var displayName = typeof type === 'function' ? type.displayName || type.name || 'Unknown' : type;
-      if (key) {
-        defineKeyPropWarningGetter(props, displayName);
-      }
-      if (ref) {
-        defineRefPropWarningGetter(props, displayName);
-      }
-    }
-  }
+  ...
   return ReactElement(type, key, ref, self, source, ReactCurrentOwner.current, props);
 }
 ```
 
+ReactElement.createElement(type, config, children)
 
+1. 把 `config`里的数据一项一项拷入props
+2. 拷贝 `children` 到 props.children
+3. 拷贝 `type.defaultProps` 到 props
+
+#### ReactElement
+
+```javascript
+// 1876
+// 创建一个新的React元素
+var ReactElement = function (type, key, ref, self, source, owner, props) {
+  var element = {
+    // 此标记将其唯一标识为React元素
+    $$typeof: REACT_ELEMENT_TYPE,
+
+    // 属于元素的内置属性
+    type: type,
+    key: key,
+    ref: ref,
+    props: props,
+
+    // 记录负责创建此元素的组件
+    _owner: owner
+  };
+
+ ...
+
+  return element;
+};
+```
 
