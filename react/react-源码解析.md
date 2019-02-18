@@ -48,7 +48,9 @@ ReactDOM.render(
 **调用栈是**
 
 ```javascript
-React.createElement => createElement => ReactElement return element; 
+React.createElement 
+|=> createElement 
+|=> ReactElement return element; 
 element = {
     $$typeof: Symbol(react.element) // 元素类型
     key: null
@@ -217,4 +219,66 @@ var ReactElement = function (type, key, ref, self, source, owner, props) {
   return element;
 };
 ```
+
+## 渲染入口 - ReactDOM.render
+
+react-dom是浏览器端渲染React应用的模块，通过ReactDOM.render(component, mountNode)可以对自定义组件/原生DOM/字符串进行挂载
+
+```javascript
+// 21079
+var ReactDOM = {
+     hydrate: function (element, container, callback) {
+   	...
+    // TODO: throw or warn if we couldn't hydrate?
+    return legacyRenderSubtreeIntoContainer(null, element, container, true, callback);
+  },
+    // 渲染方法
+  render: function (element, container, callback) {
+    ...
+    return legacyRenderSubtreeIntoContainer(null, element, container, false, callback);
+  },
+  unstable_renderSubtreeIntoContainer: function (parentComponent, element, containerNode, callback) {
+   ...
+    return legacyRenderSubtreeIntoContainer(parentComponent, element, containerNode, false, callback);
+  },
+}
+
+
+```
+
+**调用栈是**
+
+```javascript
+ReactDOM.render 
+|=> legacyRenderSubtreeIntoContainer 
+|=> var root = legacyCreateRootFromDOMContainer 
+	|=> return new ReactRoot();
+		|=> createContainer 
+            |=> createFiberRoot return root;
+				|=> createHostRootFiber
+					|=> createFiber 
+                    	|=> return new FiberNode
+|=> root.render 
+	|=> updateContainer 
+    	|=> return updateContainerAtExpirationTime
+        	|=> return scheduleRootUpdate
+        		|=> scheduleWork
+        			|=> requestWork
+        				|=> performSyncWork(|scheduleCallbackWithExpirationTime)
+        					|=> performWork
+        						|=> performWorkOnRoot
+        							|=> completeRoot
+        								|=> commitRoot
+        									|=> invokeGuardedCallback
+        										|=> invokeGuardedCallbackImpl$1
+        											|=> fakeNode.addEventListener(evtType, callCallback, false)
+														|=> callCallback
+															|=> func.apply(commitAllHostEffects.apply)
+																|=> commitPlacement
+																	|=> appendChildToContainer
+																		|=> parentNode.appendChild(child)
+
+```
+
+
 
