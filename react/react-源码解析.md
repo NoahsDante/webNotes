@@ -282,3 +282,5 @@ ReactDOM.render
 
 ### legacyRenderSubtreeIntoContainer
 
+### updateContainer
+
