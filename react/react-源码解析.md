@@ -284,3 +284,4 @@ ReactDOM.render
 
 ### updateContainer
 
+### scheduleRootUpdate
