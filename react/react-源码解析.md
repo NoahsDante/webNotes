@@ -363,7 +363,94 @@ function legacyCreateRootFromDOMContainer(container, forceHydrate) {
 }
 ```
 
+该函数实际上返回的是由**构造函数`ReactRoot`创建的对象。其中如果在非ssr的情况下，将dom根节点清空;**
 
+### ReactRoot
+
+```javascript
+function ReactRoot(container, isConcurrent, hydrate) {
+  var root = createContainer(
+      container, // ReactDOM.render(<div/>, container)的第二个参数，也就是一个元素节点
+      isConcurrent, // 是否异步模式，默认false
+      hydrate // 服务器端渲染标识 这里为false
+  );
+  this._internalRoot = root;
+}
+// 渲染
+ReactRoot.prototype.render = function (children, callback) {
+  var root = this._internalRoot;
+  var work = new ReactWork();
+  callback = callback === undefined ? null : callback;
+  {
+    warnOnInvalidCallback(callback, 'render');
+  }
+  if (callback !== null) {
+    work.then(callback);
+  }
+  updateContainer(children, root, null, work._onCommit);
+  return work;
+};
+// 销毁
+ReactRoot.prototype.unmount = function (callback) {
+  var root = this._internalRoot;
+  var work = new ReactWork();
+  callback = callback === undefined ? null : callback;
+  {
+    warnOnInvalidCallback(callback, 'render');
+  }
+  if (callback !== null) {
+    work.then(callback);
+  }
+  updateContainer(null, root, null, work._onCommit);
+  return work;
+};
+// 渲染 有父级组件的
+ReactRoot.prototype.legacy_renderSubtreeIntoContainer = function (parentComponent, children, callback) {
+  var root = this._internalRoot;
+  var work = new ReactWork();
+  callback = callback === undefined ? null : callback;
+  {
+    warnOnInvalidCallback(callback, 'render');
+  }
+  if (callback !== null) {
+    work.then(callback);
+  }
+  updateContainer(children, root, parentComponent, work._onCommit);
+  return work;
+};
+// 在createBatch中有调用，但是没发现createBatch在哪里被调用，所以，目前没发现什么作用
+ReactRoot.prototype.createBatch = function () {
+  var batch = new ReactBatch(this);
+  var expirationTime = batch._expirationTime;
+
+  var internalRoot = this._internalRoot;
+  var firstBatch = internalRoot.firstBatch;
+  if (firstBatch === null) {
+    internalRoot.firstBatch = batch;
+    batch._next = null;
+  } else {
+    // 插入按到期时间排序，然后按插入顺序排序
+    var insertAfter = null;
+    var insertBefore = firstBatch;
+    while (insertBefore !== null && insertBefore._expirationTime >= expirationTime) {
+      insertAfter = insertBefore;
+      insertBefore = insertBefore._next;
+    }
+    batch._next = insertBefore;
+    if (insertAfter !== null) {
+      insertAfter._next = batch;
+    }
+  }
+
+  return batch;
+};
+```
+
+构造函数`ReactRoot`有render、unmount、legacy_renderSubtreeIntoContainer等原型方法外，同时还声明了一个和fiber相关的`_internalRoot`属性。
+
+render 和 legacy_renderSubtreeIntoContainer原型方法都会去执行DOMRenderer.updateContainer方法更新容器内容，唯一差别就是第三个参数一个传`null`，一个传`parentComponent`。_internalRoot是由DOMRenderer.createContainer生成
+
+### createContainer
 
 
 
