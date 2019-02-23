@@ -690,7 +690,9 @@ function computeExpirationForFiber(currentTime, fiber) {
 }
 ```
 
-updateContainer**通过`computeExpirationForFiber`获得计算优先级，然后丢给updateContainerAtExpirationTime**
+**requestCurrentTime**获取当前已经花费的时间， 然后调用computeExpirationForFiber来确定我们的优先级;
+
+**computeExpirationForFiber**会根据我们当前的工作类型，比如isWorking, isCommit, isAsync 等等来返回对应的优先级，第一次渲染默认都是Sync的情况。如果不是同步渲染的情况，既Interactive 或者 Async，这时候会根据我们 **前面requestCurrentTime获取的已花费时间** 调用相应的算法来确定优先级
 
 ### updateContainerAtExpirationTime
 
@@ -728,4 +730,95 @@ function updateContainerAtExpirationTime(element, container, parentComponent, ex
 updateContainerAtExpirationTime其实相当于什么都没做，通过getContextForSubtree（这里getContextForSubtree因为一开始parentComponent是不存在的，**于是返回一个空对象**。注意，**这个空对象可以重复使用**，不用每次返回一个新的空对象，这是一个很好的优化）获得上下文对象，然后分配给container.context或container.pendingContext，最后一起丢给scheduleRootUpdate
 
 ### scheduleRootUpdate
+
+```javascript
+function scheduleRootUpdate(current$$1, element, expirationTime, callback) {
+  {
+    if (phase === 'render' && current !== null && !didWarnAboutNestedUpdates) {
+      didWarnAboutNestedUpdates = true;
+      warningWithoutStack$1(false, 'Render methods should be a pure function of props and state; ' + 'triggering nested component updates from render is not allowed. ' + 'If necessary, trigger nested updates in componentDidUpdate.\n\n' + 'Check the render method of %s.', getComponentName(current.type) || 'Unknown');
+    }
+  }
+// 返回一个包含以上属性的update对象
+  var update = createUpdate(expirationTime);
+  // Caution: React DevTools currently depends on this property
+ // 将虚拟dom树放入payload 
+  update.payload = { element: element };
+
+  callback = callback === undefined ? null : callback;
+  if (callback !== null) {
+    !(typeof callback === 'function') ? warningWithoutStack$1(false, 'render(...): Expected the last optional `callback` argument to be a ' + 'function. Instead received: %s.', callback) : void 0;
+    update.callback = callback;
+  }
+
+  flushPassiveEffects();
+    // 开始队列更新
+  enqueueUpdate(current$$1, update);
+  // 调用调度器API：scheduleWork(...)来调度fiber任务
+  scheduleWork(current$$1, expirationTime);
+
+  return expirationTime;
+}
+function enqueueUpdate(fiber, update) {
+  // alternate 主要用来保存更新过程中各版本更新队列，方便崩溃或冲突时回退.
+  var alternate = fiber.alternate;
+   // 创建两个独立的更新队列
+  var queue1 = void 0;
+  var queue2 = void 0;
+  if (alternate === null) {
+    //只存在一个 fiber.
+    queue1 = fiber.updateQueue;
+    queue2 = null;
+    if (queue1 === null) {
+        // 如果不存在，则创建一个更新队列
+      queue1 = fiber.updateQueue = createUpdateQueue(fiber.memoizedState);
+    }
+  } else {
+    // 两个所有者
+    queue1 = fiber.updateQueue;
+    queue2 = alternate.updateQueue;
+    if (queue1 === null) {
+      if (queue2 === null) {
+        // 如果两个都不存在，则创建两个新的
+        queue1 = fiber.updateQueue = createUpdateQueue(fiber.memoizedState);
+        queue2 = alternate.updateQueue = createUpdateQueue(alternate.memoizedState);
+      } else {
+        // 如果两个都不存在，则创建两个新的
+        queue1 = fiber.updateQueue = cloneUpdateQueue(queue2);
+      }
+    } else {
+      if (queue2 === null) {
+        // queue2 不存在，queue1 存在，queue2 根据 queue1 创建
+        queue2 = alternate.updateQueue = cloneUpdateQueue(queue1);
+      } else {
+         // 全都有
+      }
+    }
+  }
+  if (queue2 === null || queue1 === queue2) {
+    // 只存在一个更新队列
+    appendUpdateToQueue(queue1, update);
+  } else {
+    // 如果任意更新队列为空，则需要将更新添加至两个更新队列
+    if (queue1.lastUpdate === null || queue2.lastUpdate === null) {
+      // One of the queues is not empty. We must add the update to both queues.
+      appendUpdateToQueue(queue1, update);
+      appendUpdateToQueue(queue2, update);
+    } else {
+      // 如果任意更新队列为空，则需要将更新添加至两个更新队列
+      appendUpdateToQueue(queue1, update);
+      queue2.lastUpdate = update;
+    }
+  }
+
+  {
+    if (fiber.tag === ClassComponent && (currentlyProcessingQueue === queue1 || queue2 !== null && currentlyProcessingQueue === queue2) && !didWarnUpdateInsideUpdate) {
+      warningWithoutStack$1(false, 'An update (setState, replaceState, or forceUpdate) was scheduled ' + 'from inside an update function. Update functions should be pure, ' + 'with zero side-effects. Consider using componentDidUpdate or a ' + 'callback.');
+      didWarnUpdateInsideUpdate = true;
+    }
+  }
+}
+```
+
+scheduleRootUpdate`是将用户的传参封装成一个`update`对象, 其中`update`对象有`payload对象，它就是相当于React15中 的setState的第一个state传参，但现在payload中把children也放进去了。然后添加更新任务至fiber：enqueueUpdate(...)
 
