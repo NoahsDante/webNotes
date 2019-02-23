@@ -692,6 +692,40 @@ function computeExpirationForFiber(currentTime, fiber) {
 
 updateContainer**通过`computeExpirationForFiber`获得计算优先级，然后丢给updateContainerAtExpirationTime**
 
+### updateContainerAtExpirationTime
 
+```javascript
+// 根据渲染优先级更新dom
+function updateContainerAtExpirationTime(element, container, parentComponent, expirationTime, callback) {
+  // TODO: If this is a nested container, this won't be the root.
+  // 引用fiber对象
+  var current$$1 = container.current;
+
+  {
+    if (ReactFiberInstrumentation_1.debugTool) {
+      if (current$$1.alternate === null) {
+        ReactFiberInstrumentation_1.debugTool.onMountContainer(container);
+      } else if (element === null) {
+        ReactFiberInstrumentation_1.debugTool.onUnmountContainer(container);
+      } else {
+        ReactFiberInstrumentation_1.debugTool.onUpdateContainer(container);
+      }
+    }
+  }
+ // 获得上下文对象
+  var context = getContextForSubtree(parentComponent);
+  if (container.context === null) {
+    container.context = context;
+  } else {
+    container.pendingContext = context;
+  }
+
+  return scheduleRootUpdate(current$$1, element, expirationTime, callback);
+}
+
+```
+
+updateContainerAtExpirationTime其实相当于什么都没做，通过getContextForSubtree（这里getContextForSubtree因为一开始parentComponent是不存在的，**于是返回一个空对象**。注意，**这个空对象可以重复使用**，不用每次返回一个新的空对象，这是一个很好的优化）获得上下文对象，然后分配给container.context或container.pendingContext，最后一起丢给scheduleRootUpdate
 
 ### scheduleRootUpdate
+
