@@ -610,7 +610,87 @@ createContainer`创建`FiberRoot;
 
 createFiberRoot就是创建了一个普通对象，里面current属性引用fiber对象，containerInfo属性引用ReactDOM.render(<div/>, container)的第二个参数，也就是一个元素节点，然后fiber对象的stateNode引用普通对象root
 
+### root.render 
+
+```javascript
+ReactRoot.prototype.render = function (children, callback) {
+  var root = this._internalRoot;
+  var work = new ReactWork();
+  callback = callback === undefined ? null : callback;
+  {
+    warnOnInvalidCallback(callback, 'render');
+  }
+  if (callback !== null) {
+    work.then(callback);
+  }
+  updateContainer(children, root, null, work._onCommit);
+  return work;
+};
+```
+
 ### updateContainer
+
+```javascript
+function updateContainer(element, container, parentComponent, callback) {
+  var current$$1 = container.current;
+  var currentTime = requestCurrentTime();
+  var expirationTime = computeExpirationForFiber(currentTime, current$$1);
+  return updateContainerAtExpirationTime(element, container, parentComponent, expirationTime, callback);
+}
+// 计算fiber超时时间
+function computeExpirationForFiber(currentTime, fiber) {
+  var priorityLevel = unstable_getCurrentPriorityLevel();
+// 显示设置过期上下文
+  var expirationTime = void 0;
+  if ((fiber.mode & ConcurrentMode) === NoContext) {
+     // 在提交阶段的更新任务
+      // 需要明确设置同步优先级（Sync Priority）
+    expirationTime = Sync;
+  } else if (isWorking && !isCommitting$1) {
+    // 在渲染阶段发生的更新任务
+    // 需要设置为下一次渲染时间的到期时间优先级
+    expirationTime = nextRenderExpirationTime;
+  } else {
+      // 不在任务执行阶段，需要计算新的过期时间
+    switch (priorityLevel) {
+      case unstable_ImmediatePriority:
+        expirationTime = Sync;
+        break;
+      case unstable_UserBlockingPriority:
+        expirationTime = computeInteractiveExpiration(currentTime);
+        break;
+      case unstable_NormalPriority:
+        // This is a normal, concurrent update
+        expirationTime = computeAsyncExpiration(currentTime);
+        break;
+      case unstable_LowPriority:
+      case unstable_IdlePriority:
+        expirationTime = Never;
+        break;
+      default:
+        invariant(false, 'Unknown priority level. This error is likely caused by a bug in React. Please file an issue.');
+    }
+
+    // If we're in the middle of rendering a tree, do not update at the same
+    // expiration time that is already rendering.
+    if (nextRoot !== null && expirationTime === nextRenderExpirationTime) {
+      expirationTime -= 1;
+    }
+  }
+
+  // Keep track of the lowest pending interactive expiration time. This
+  // allows us to synchronously flush all interactive updates
+  // when needed.
+  // TODO: Move this to renderer?
+  if (priorityLevel === unstable_UserBlockingPriority && (lowestPriorityPendingInteractiveExpirationTime === NoWork || expirationTime < lowestPriorityPendingInteractiveExpirationTime)) {
+    lowestPriorityPendingInteractiveExpirationTime = expirationTime;
+  }
+
+  return expirationTime;
+}
+```
+
+updateContainer**通过`computeExpirationForFiber`获得计算优先级，然后丢给updateContainerAtExpirationTime**
 
 
 
