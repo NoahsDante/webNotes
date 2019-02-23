@@ -822,3 +822,4 @@ function enqueueUpdate(fiber, update) {
 
 scheduleRootUpdate`是将用户的传参封装成一个`update`对象, 其中`update`对象有`payload对象，它就是相当于React15中 的setState的第一个state传参，但现在payload中把children也放进去了。然后添加更新任务至fiber：enqueueUpdate(...)
 
+`enqueueUpdate`是一个链表，然后根据`fiber`的状态创建一个或两个列队对象，再接下来调用调度器API：`scheduleWork(...)`来调度fiber任务
