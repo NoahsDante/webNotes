@@ -121,3 +121,124 @@ function doResolve(fn, onResolve, onReject) {
 
 现在我们基本实现了Promise标准中所涉及到的内容;
 
+## 问题
+
+### Promise值的穿透
+
+```javascript
+var myProimse =new MyProimse(function (resolve,reject) {
+    resolve(2)
+})
+myProimse.then().then(function (val) {
+    console.log(val); // 2
+})
+```
+
+实现
+
+```javascript
+function handle(onResolve,onReject,resolve,reject) {
+    var cb = state ? onResolve : onReject;
+    // 加入判断
+    if(cb === null || cb === undefined) {
+        (state ? resolve : reject)(value);
+        return 
+    }
+    var ret;
+    try {
+        ret = cb(value);
+    } catch (e) {
+        reject(e);
+    }
+    resolve(ret);
+}
+```
+
+### then返回一个promise 
+
+```javascript
+var myProimse =new MyProimse(function (resolve,reject) {
+        resolve(2)
+    })
+    myProimse.then(function (val) {
+        console.log(val);
+        return new MyProimse(function (resolve,reject) {
+        	resolve(4)
+    	})
+    }).then(function (val) {
+        console.log(val); // 4
+    })
+```
+
+实现
+
+```javascript
+function resolve(newValue) {
+    if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
+        var then = newValue.then
+        if (typeof then === 'function') {
+            doResolve(then.bind(newValue), resolve, reject)
+            return
+        }
+    }
+    state = true;
+    value = newValue;
+
+}
+```
+
+## 最后完整代码
+
+```javascript
+function MyProimse(fn) {
+    var state = null,  // 状态 当然这里是使用 true、false、null表示
+        value = null,  // Promise的值
+        self = this;
+
+    this.then = function (onResolve,onRject) {
+        return new self.constructor(function (resolve,reject) {
+            handle(onResolve,onRject,resolve,reject);
+        });
+    }
+    function handle(onResolve,onReject,resolve,reject) {
+        var cb = state ? onResolve : onReject;
+        if(cb === null || cb === undefined) {
+            (state ? resolve : reject)(value);
+            return 
+        }
+        var ret;
+        try {
+            ret = cb(value);
+        } catch (e) {
+            reject(e);
+        }
+        resolve(ret);
+    }
+
+    function resolve(newValue) {
+        if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
+            var then = newValue.then
+            if (typeof then === 'function') {
+                doResolve(then.bind(newValue), resolve, reject)
+                return
+            }
+        }
+        state = true;
+        value = newValue;
+    }
+    function reject(newValue) {
+        state = false;
+        value = newValue;
+    }
+    doResolve(fn,resolve,reject)
+}
+
+function doResolve(fn, onResolve, onReject) {
+    try {
+        fn(onResolve, onReject);
+    } catch (e) {
+        onReject(e);
+    }
+}
+```
+
