@@ -5,19 +5,22 @@
     <title>Title</title>
 </head>
 <body>
-<script type="text/javascript" src="myProimse.js"></script>
+<script type="text/javascript" src="myPromise.js"></script>
 <!--<script src="https://www.promisejs.org/polyfills/promise-6.1.0.js"></script>-->
 <script type="text/javascript">
-    const promise = new MyProimse(function(resolve, reject) {
-        if (true){
-            resolve(1);
-        } else {
-            reject(2);
-        }
-    });
-    promise.then(function (val) {
-        console.log(val)
-    });
+    var myProimse =new MyProimse(function (resolve,reject) {
+        resolve(2)
+    })
+    myProimse.then(function (val) {
+        console.log(val);
+        return '4'
+    },function (val) {
+        console.log(val);
+    }).then(function (val) {
+        console.log(val);
+    })
+
+
 </script>
 </body>
 </html>

@@ -1,111 +1,7 @@
-var head = {task: void 0, next: null};
-var tail = head;
-var flushing = false;
-var requestFlush = void 0;
-var isNodeJS = false;
-
-function flush() {
-    /* jshint loopfunc: true */
-
-    while (head.next) {
-        head = head.next;
-        var task = head.task;
-        head.task = void 0;
-        var domain = head.domain;
-
-        if (domain) {
-            head.domain = void 0;
-            domain.enter();
-        }
-
-        try {
-            task();
-
-        } catch (e) {
-            if (isNodeJS) {
-                // In node, uncaught exceptions are considered fatal errors.
-                // Re-throw them synchronously to interrupt flushing!
-
-                // Ensure continuation if the uncaught exception is suppressed
-                // listening "uncaughtException" events (as domains does).
-                // Continue in next event to avoid tick recursion.
-                if (domain) {
-                    domain.exit();
-                }
-                setTimeout(flush, 0);
-                if (domain) {
-                    domain.enter();
-                }
-
-                throw e;
-
-            } else {
-                // In browsers, uncaught exceptions are not fatal.
-                // Re-throw them asynchronously to avoid slow-downs.
-                setTimeout(function() {
-                    throw e;
-                }, 0);
-            }
-        }
-
-        if (domain) {
-            domain.exit();
-        }
-    }
-
-    flushing = false;
-}
-
-if (typeof process !== "undefined" && process.nextTick) {
-    // Node.js before 0.9. Note that some fake-Node environments, like the
-    // Mocha test runner, introduce a `process` global without a `nextTick`.
-    isNodeJS = true;
-
-    requestFlush = function () {
-        process.nextTick(flush);
-    };
-
-} else if (typeof setImmediate === "function") {
-    // In IE10, Node.js 0.9+, or https://github.com/NobleJS/setImmediate
-    if (typeof window !== "undefined") {
-        requestFlush = setImmediate.bind(window, flush);
-    } else {
-        requestFlush = function () {
-            setImmediate(flush);
-        };
-    }
-
-} else if (typeof MessageChannel !== "undefined") {
-    // modern browsers
-    // http://www.nonblocking.io/2011/06/windownexttick.html
-    var channel = new MessageChannel();
-    channel.port1.onmessage = flush;
-    requestFlush = function () {
-        channel.port2.postMessage(0);
-    };
-
-} else {
-    // old browsers
-    requestFlush = function () {
-        setTimeout(flush, 0);
-    };
-}
-
 function asap(task) {
-    tail = tail.next = {
-        task: task,
-        domain: isNodeJS && process.domain,
-        next: null
-    };
-
-    if (!flushing) {
-        flushing = true;
-        requestFlush();
-    }
+    task();
 };
-function MyProimse(fn) {
-    if (typeof this !== 'object') throw new TypeError('MyProimses must be constructed via new')
-    if (typeof fn !== 'function') throw new TypeError('not a function')
+function Proimse(fn) {
     var state = null
     var value = null
     var deferreds = []
@@ -141,7 +37,7 @@ function MyProimse(fn) {
     }
 
     function resolve(newValue) {
-        try { //MyProimse Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
+        try { //Proimse Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
             if (newValue === self) throw new TypeError('A promise cannot be resolved with itself.')
             if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
                 var then = newValue.then
@@ -206,10 +102,10 @@ function doResolve(fn, onFulfilled, onRejected) {
 
 /* Static Functions */
 
-function ValueMyProimse(value) {
+function ValueProimse(value) {
     this.then = function (onFulfilled) {
         if (typeof onFulfilled !== 'function') return this
-        return new MyProimse(function (resolve, reject) {
+        return new Proimse(function (resolve, reject) {
             asap(function () {
                 try {
                     resolve(onFulfilled(value))
@@ -220,17 +116,17 @@ function ValueMyProimse(value) {
         })
     }
 }
-ValueMyProimse.prototype = MyProimse.prototype
+ValueProimse.prototype = Proimse.prototype
 
-var TRUE = new ValueMyProimse(true)
-var FALSE = new ValueMyProimse(false)
-var NULL = new ValueMyProimse(null)
-var UNDEFINED = new ValueMyProimse(undefined)
-var ZERO = new ValueMyProimse(0)
-var EMPTYSTRING = new ValueMyProimse('')
+var TRUE = new ValueProimse(true)
+var FALSE = new ValueProimse(false)
+var NULL = new ValueProimse(null)
+var UNDEFINED = new ValueProimse(undefined)
+var ZERO = new ValueProimse(0)
+var EMPTYSTRING = new ValueProimse('')
 
-MyProimse.resolve = function (value) {
-    if (value instanceof MyProimse) return value
+Proimse.resolve = function (value) {
+    if (value instanceof Proimse) return value
 
     if (value === null) return NULL
     if (value === undefined) return UNDEFINED
@@ -243,22 +139,22 @@ MyProimse.resolve = function (value) {
         try {
             var then = value.then
             if (typeof then === 'function') {
-                return new MyProimse(then.bind(value))
+                return new Proimse(then.bind(value))
             }
         } catch (ex) {
-            return new MyProimse(function (resolve, reject) {
+            return new Proimse(function (resolve, reject) {
                 reject(ex)
             })
         }
     }
 
-    return new ValueMyProimse(value)
+    return new ValueProimse(value)
 }
 
-MyProimse.all = function (arr) {
+Proimse.all = function (arr) {
     var args = Array.prototype.slice.call(arr)
 
-    return new MyProimse(function (resolve, reject) {
+    return new Proimse(function (resolve, reject) {
         if (args.length === 0) return resolve([])
         var remaining = args.length
         function res(i, val) {
@@ -284,22 +180,22 @@ MyProimse.all = function (arr) {
     })
 }
 
-MyProimse.reject = function (value) {
-    return new MyProimse(function (resolve, reject) {
+Proimse.reject = function (value) {
+    return new Proimse(function (resolve, reject) {
         reject(value);
     });
 }
 
-MyProimse.race = function (values) {
-    return new MyProimse(function (resolve, reject) {
+Proimse.race = function (values) {
+    return new Proimse(function (resolve, reject) {
         values.forEach(function(value){
-            MyProimse.resolve(value).then(resolve, reject);
+            Proimse.resolve(value).then(resolve, reject);
         })
     });
 }
 
 /* Prototype Methods */
 
-MyProimse.prototype['catch'] = function (onRejected) {
+Proimse.prototype['catch'] = function (onRejected) {
     return this.then(null, onRejected);
 }
