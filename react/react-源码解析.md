@@ -1387,5 +1387,147 @@ function commitRoot(root, finishedWork) {
 }
 ```
 
+处理完更新后需要确认提交更新至渲染模块，然后渲染模块才能将更新渲染至DOM
 
+### commitWork
+
+```javascript
+function commitWork(current$$1, finishedWork) {
+  if (!supportsMutation) {
+    switch (finishedWork.tag) {
+      case FunctionComponent:
+      case ForwardRef:
+      case MemoComponent:
+      case SimpleMemoComponent:
+        {
+          // Note: We currently never use MountMutation, but useLayout uses
+          // UnmountMutation.
+          commitHookEffectList(UnmountMutation, MountMutation, finishedWork);
+          return;
+        }
+    }
+
+    commitContainer(finishedWork);
+    return;
+  }
+
+  switch (finishedWork.tag) {
+    case FunctionComponent:
+    case ForwardRef:
+    case MemoComponent:
+    case SimpleMemoComponent:
+      {
+        // Note: We currently never use MountMutation, but useLayout uses
+        // UnmountMutation.
+        commitHookEffectList(UnmountMutation, MountMutation, finishedWork);
+        return;
+      }
+    case ClassComponent:
+      {
+        return;
+      }
+    case HostComponent:
+      {
+        var instance = finishedWork.stateNode;
+        if (instance != null) {
+          // Commit the work prepared earlier.
+          var newProps = finishedWork.memoizedProps;
+          // For hydration we reuse the update path but we treat the oldProps
+          // as the newProps. The updatePayload will contain the real change in
+          // this case.
+          var oldProps = current$$1 !== null ? current$$1.memoizedProps : newProps;
+          var type = finishedWork.type;
+          // TODO: Type the updateQueue to be specific to host components.
+          var updatePayload = finishedWork.updateQueue;
+          finishedWork.updateQueue = null;
+          if (updatePayload !== null) {
+            commitUpdate(instance, updatePayload, type, oldProps, newProps, finishedWork);
+          }
+        }
+        return;
+      }
+    case HostText:
+      {
+        !(finishedWork.stateNode !== null) ? invariant(false, 'This should have a text node initialized. This error is likely caused by a bug in React. Please file an issue.') : void 0;
+        var textInstance = finishedWork.stateNode;
+        var newText = finishedWork.memoizedProps;
+        // For hydration we reuse the update path but we treat the oldProps
+        // as the newProps. The updatePayload will contain the real change in
+        // this case.
+        var oldText = current$$1 !== null ? current$$1.memoizedProps : newText;
+        commitTextUpdate(textInstance, oldText, newText);
+        return;
+      }
+    case HostRoot:
+      {
+        return;
+      }
+    case Profiler:
+      {
+        return;
+      }
+    case SuspenseComponent:
+      {
+        var newState = finishedWork.memoizedState;
+
+        var newDidTimeout = void 0;
+        var primaryChildParent = finishedWork;
+        if (newState === null) {
+          newDidTimeout = false;
+        } else {
+          newDidTimeout = true;
+          primaryChildParent = finishedWork.child;
+          if (newState.timedOutAt === NoWork) {
+            // If the children had not already timed out, record the time.
+            // This is used to compute the elapsed time during subsequent
+            // attempts to render the children.
+            newState.timedOutAt = requestCurrentTime();
+          }
+        }
+
+        if (primaryChildParent !== null) {
+          hideOrUnhideAllChildren(primaryChildParent, newDidTimeout);
+        }
+
+        // If this boundary just timed out, then it will have a set of thenables.
+        // For each thenable, attach a listener so that when it resolves, React
+        // attempts to re-render the boundary in the primary (pre-timeout) state.
+        var thenables = finishedWork.updateQueue;
+        if (thenables !== null) {
+          finishedWork.updateQueue = null;
+          var retryCache = finishedWork.stateNode;
+          if (retryCache === null) {
+            retryCache = finishedWork.stateNode = new PossiblyWeakSet$1();
+          }
+          thenables.forEach(function (thenable) {
+            // Memoize using the boundary fiber to prevent redundant listeners.
+            var retry = retryTimedOutBoundary.bind(null, finishedWork, thenable);
+            if (enableSchedulerTracing) {
+              retry = unstable_wrap(retry);
+            }
+            if (!retryCache.has(thenable)) {
+              retryCache.add(thenable);
+              thenable.then(retry, retry);
+            }
+          });
+        }
+
+        return;
+      }
+    case IncompleteClassComponent:
+      {
+        return;
+      }
+    default:
+      {
+        invariant(false, 'This unit of work tag should not have side-effects. This error is likely caused by a bug in React. Please file an issue.');
+      }
+  }
+}
+```
+
+## 小结
+
+首次渲染的执行流程为：
+`**ReactDOM.render`（渲染入口） => `legacyRenderSubtreeIntoContainer`（把虚拟的dom树渲染到真实的dom容器中） => `DOMRenderer.updateContainer`（更新容器内容） => `scheduleRootUpdate`（开始更新） => `scheduleWork`（处理更新） => `commitWork`（提交更新**）
 
