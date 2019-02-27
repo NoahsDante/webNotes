@@ -822,12 +822,13 @@ function enqueueUpdate(fiber, update) {
 
 scheduleRootUpdate`是将用户的传参封装成一个`update`对象, 其中`update`对象有`payload对象，它就是相当于React15中 的setState的第一个state传参，但现在payload中把children也放进去了。然后添加更新任务至fiber：enqueueUpdate(...)
 
-`enqueueUpdate`是一个链表，然后根据`fiber`的状态创建一个或两个列队对象，再接下来调用调度器API：`scheduleWork(...)`来调度fiber任务
+`enqueueUpdate`是一个链表，**然后根据`fiber`的状态创建一个或两个列队对象，再接下来调用调度器**API：`**scheduleWork(...)`来调度fiber任务**
 
 ### scheduleWork
 
 ```javascript
 function scheduleWork(fiber, expirationTime) {
+     
   var root = scheduleWorkToRoot(fiber, expirationTime);
   if (root === null) {
     {
@@ -847,7 +848,6 @@ function scheduleWork(fiber, expirationTime) {
   }
 
   if (!isWorking && nextRenderExpirationTime !== NoWork && expirationTime > nextRenderExpirationTime) {
-    // This is an interruption. (Used for performance tracking.)
     interruptedBy = fiber;
     resetStack();
   }
@@ -868,6 +868,7 @@ function scheduleWork(fiber, expirationTime) {
   }
 }
 function scheduleWorkToRoot(fiber, expirationTime) {
+   // 记录调度器的执行状态
   recordScheduleUpdate();
 
   {
@@ -877,7 +878,7 @@ function scheduleWorkToRoot(fiber, expirationTime) {
     }
   }
 
-  // Update the source fiber's expiration time
+  // 更新 fiber实例的过期时间
   if (fiber.expirationTime < expirationTime) {
     fiber.expirationTime = expirationTime;
   }
@@ -885,7 +886,7 @@ function scheduleWorkToRoot(fiber, expirationTime) {
   if (alternate !== null && alternate.expirationTime < expirationTime) {
     alternate.expirationTime = expirationTime;
   }
-  // Walk the parent path to the root and update the child expiration time.
+  // 将父路径遍历到根目录并更新子过期时间
   var node = fiber.return;
   var root = null;
   if (node === null && fiber.tag === HostRoot) {
@@ -942,6 +943,102 @@ function scheduleWorkToRoot(fiber, expirationTime) {
     }
   }
   return root;
+}
+function recordScheduleUpdate() {
+  if (enableUserTimingAPI) {
+    if (isCommitting) {
+      hasScheduledUpdateInCurrentCommit = true;
+    }
+    if (currentPhase !== null && currentPhase !== 'componentWillMount' && currentPhase !== 'componentWillReceiveProps') {
+      hasScheduledUpdateInCurrentPhase = true;
+    }
+  }
+}
+```
+
+`scheduleWork`**主要进行虚拟DOM（fiber树）的更新**;
+
+**recordScheduleUpdate主要用来记录调度器的执行状态，如注释所示，它现在相当于什么都没有做**
+
+### requestWork
+
+```javascript
+function requestWork(root, expirationTime) {
+  addRootToSchedule(root, expirationTime);
+  if (isRendering) {
+    // 防止重入。其余工作将安排在
+    // 当前呈现批处理
+    return;
+  }
+
+  if (isBatchingUpdates) {
+    // 批处理结束时的刷新工作
+    if (isUnbatchingUpdates) {
+      nextFlushedRoot = root;
+      nextFlushedExpirationTime = Sync;
+      performWorkOnRoot(root, Sync, false);
+    }
+    return;
+  }
+
+  // 摆脱同步并使用当前时间
+  if (expirationTime === Sync) {
+    performSyncWork();
+  } else {
+    scheduleCallbackWithExpirationTime(root, expirationTime);
+  }
+}
+```
+
+### performWork
+
+```javascript
+function performSyncWork() {
+  performWork(Sync, false);
+}
+function performWork(minExpirationTime, isYieldy) {
+  // 继续工作的根, 直到有没有更多的工作, 或直到有一个更高的
+  // 优先级事件
+  findHighestPriorityRoot();
+
+  if (isYieldy) {
+    recomputeCurrentRendererTime();
+    currentSchedulerTime = currentRendererTime;
+
+    if (enableUserTimingAPI) {
+      var didExpire = nextFlushedExpirationTime > currentRendererTime;
+      var timeout = expirationTimeToMs(nextFlushedExpirationTime);
+      stopRequestCallbackTimer(didExpire, timeout);
+    }
+
+    while (nextFlushedRoot !== null && nextFlushedExpirationTime !== NoWork && minExpirationTime <= nextFlushedExpirationTime && !(didYield && currentRendererTime > nextFlushedExpirationTime)) {
+      performWorkOnRoot(nextFlushedRoot, nextFlushedExpirationTime, currentRendererTime > nextFlushedExpirationTime);
+      findHighestPriorityRoot();
+      recomputeCurrentRendererTime();
+      currentSchedulerTime = currentRendererTime;
+    }
+  } else {
+    while (nextFlushedRoot !== null && nextFlushedExpirationTime !== NoWork && minExpirationTime <= nextFlushedExpirationTime) {
+      performWorkOnRoot(nextFlushedRoot, nextFlushedExpirationTime, false);
+      findHighestPriorityRoot();
+    }
+  }
+
+  // We're done flushing work. Either we ran out of time in this callback,
+  // or there's no more work left with sufficient priority.
+
+  // If we're inside a callback, set this to false since we just completed it.
+  if (isYieldy) {
+    callbackExpirationTime = NoWork;
+    callbackID = null;
+  }
+  // 如果还有工作要做, 请安排新的回调.
+  if (nextFlushedExpirationTime !== NoWork) {
+    scheduleCallbackWithExpirationTime(nextFlushedRoot, nextFlushedExpirationTime);
+  }
+
+  // 清除.
+  finishRendering();
 }
 ```
 
