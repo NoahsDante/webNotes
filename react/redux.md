@@ -12,3 +12,86 @@
 
 # 三个基本原则
 
+## 唯一的事实来源
+
+**整个应用程序都存储在一个对象树上的一个内store**
+
+```javascript
+var store = {
+    visibilityFilter: 'SHOW_ALL',
+  todos: [
+    {
+      text: 'Consider using Redux',
+      completed: true,
+    },
+    {
+      text: 'Keep all state in a single tree',
+      completed: false
+    }
+  ]
+}
+```
+
+
+
+## State是只读的
+
+**改变状态的唯一方法是发出一个动作，一个描述发生的事情的对象**
+
+```javascript
+store.dispatch({
+  type: 'COMPLETE_TODO',
+  index: 1
+})
+
+store.dispatch({
+  type: 'SET_VISIBILITY_FILTER',
+  filter: 'SHOW_COMPLETED'
+})
+```
+
+
+
+## 使用纯函数进行更改
+
+**要指定状态树如何通过操作转换**
+
+```javascript
+function visibilityFilter(state = 'SHOW_ALL', action) {
+  switch (action.type) {
+    case 'SET_VISIBILITY_FILTER':
+      return action.filter
+    default:
+      return state
+  }
+}
+
+function todos(state = [], action) {
+  switch (action.type) {
+    case 'ADD_TODO':
+      return [
+        ...state,
+        {
+          text: action.text,
+          completed: false
+        }
+      ]
+    case 'COMPLETE_TODO':
+      return state.map((todo, index) => {
+        if (index === action.index) {
+          return Object.assign({}, todo, {
+            completed: true
+          })
+        }
+        return todo
+      })
+    default:
+      return state
+  }
+}
+
+import { combineReducers, createStore } from 'redux'
+const reducer = combineReducers({ visibilityFilter, todos })
+const store = createStore(reducer)
+```
+
