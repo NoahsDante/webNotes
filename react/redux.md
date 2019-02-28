@@ -10,6 +10,8 @@
 
 在[Flux](http://facebook.github.io/flux)，[CQRS](http://martinfowler.com/bliki/CQRS.html)和[Event Sourcing](http://martinfowler.com/eaaDev/EventSourcing.html)的步骤之后,Redux尝试**通过对更新发生的方式和时间施加某些限制**来使状态突变可预测**。这些限制反映在Redux 的[三个原则](https://redux.js.org/introduction/three-principles)
 
+使用Redux可以获得的一些好处包括日志记录，热重新加载，时间旅行，通用应用程序，记录和重放 - 所有这些都不会像开发人员那样做得太多
+
 # 三个基本原则
 
 ## 唯一的事实来源
