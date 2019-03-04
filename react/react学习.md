@@ -21,5 +21,47 @@ React以**可变的方式（可通过setState更改）**和**props以只读方�
 
 ## state 在 react中
 
+### React中的可变状态：组件状态
+
+永远不要在React组件中直接**修改this.state**；必须**通过this.setState修改**；
+
+**this.setState()不会立即改变this.state**,**State的更新是异步**;等到一定的时间，在全部一起执行；
+
+```javascript
+setState( 
+    updater,
+[callback] )
+ callback = (prevState, props) => stateChange
+```
+
+使用过去的React版本，您可以**将对象而不是函数作为setState的第一个参数传递**。与当前版本的React（16及更高版本）的一个主要区别在于它可能意味着setState本质上是同步
+
+如果需要根据**当前state或props进行状态更新**，可以通过prevState和props参数访问它们;当您想要**执行诸如切换布尔值以及在执行更新之前需要知道确切的最后一个值之类的操作时**
+
+使用updater函数返回的对象，它执行浅合并到当前状态。这意味着您可以生成一个对象;**但只是浅合并**
+
+```javascript
+this.state = {
+    user: {
+    name: 'Mark', // 1 
+    colors: {
+        favorite: '', 
+        }
+    } 
+};
+this.setState({
+    user: { // 2
+    colors: { 
+        	favorite: 'blue'
+        } 
+    }
+});	
+{this.state.name} // ''
+```
+
+怎样解决使用 
+
+**react-addons-update**
+
 
 
