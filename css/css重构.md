@@ -296,3 +296,12 @@ ID几乎正好相反;它们具有**非常高的特异性**，**因此它们不�
 
 ## Lists
 
+• font-family
+• font-size
+• list-style-type or list-style-image
+• list-style-position
+• line-height
+• margin-bottom
+• margin-top
+• padding-left
+
