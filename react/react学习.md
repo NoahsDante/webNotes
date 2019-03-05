@@ -59,9 +59,47 @@ this.setState({
 {this.state.name} // ''
 ```
 
-怎样解决使用 
+**怎样解决使用** 
 
 **react-addons-update**
+
+### React中的不可变状态：props
+
+**在React中，props是传递不可变数据的主要方式**。任何组件都可以接收道具（不仅仅是那些从React.Component继承的道具）并在构造函数，渲染和生命周期方法中使用它们.
+
+React中的props或多或少是不可变的。您可以使用库和其他工具来模拟组件中的不可变数据结构， **React使用本机JavaScript Object.freeze**
+
+**Props是从父组件或组件本身的defaultProps静态方法传递给React组件的数据**。
+
+props可能会随着时间而变化，但不会从组件内部变化。这是单向数据流的一部分；
+
+#### 在render方法中调用setState
+
+会无限循环下去，一直更新dom，到最后就会报错
+
+### 使用PropTypes and default props
+
+**PropTypes提供了一个类型检查功能**，您可以在其中指定组件在使用时期望接收的props类型。您可以指定数据类型，甚至告诉组件使用者他们需要提供哪种类型的数据（例如，具有某些键的用户属性的对象）
+
+它也不是React特有的 - 您可以在另一个想要对输入进行类型检查的库中轻松使用它；
+
+请注意，您在组件类上设置的**静态属性的名称是小写**，而从**proptypes库访问的对象的名称是大写（PropTypes）**
+
+**defaultProps的属性，用于为组件提供默认props**。使用默认**props**有助于确保您的组件具有运行所需的内容，即使使用该组件的某人忘记为其提供**props**也是如此
+
+```javascript
+class Counter extends React.Component {
+    static propTypes = {
+    incrementBy: PropTypes.number,
+    onIncrement: PropTypes.func.isRequired 
+  };
+  static defaultProps = {
+    incrementBy: 1
+  };
+}
+```
+
+
 
 
 
