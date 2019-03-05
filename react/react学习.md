@@ -99,7 +99,35 @@ class Counter extends React.Component {
 }
 ```
 
+### 无状态功能组件
 
+如Flux和Redux。在这些情况下，您通常希望**将状态保持在集中位置，而不是分布在组件中**;
 
+**可以创建一种仅使用props的组件：无状态功能组件**
 
+无状态功能组件只是：一个**无法访问或使用React状态API的组件（或从React.Component继承的其他方法）**。它**是无状态的，不是因为它没有任何类型的（通用）状态**，而是因为它没有得到React将为您管理的支持实例
+
+无状态功能组件**是功能性的**，因为它们可以**写为命名函数或分配给变量的匿名函数表达式**。它们**只接受props**，因为它们根据**给定的输入返回相同的输出**，基本上被认为是纯粹的。这使得它们更快，因为React可能通过**避免不必要的生命周期检查或内存分配来进行优化**
+
+```javascript
+import React from "react";
+import { render } from "react-dom";
+import PropTypes from "prop-types";
+function Greeting(props) {
+  return <div>Hello {props.for}!</div>;
+}
+
+Greeting.propTypes = {
+  for: PropTypes.string.isRequired
+};
+
+Greeting.defaultProps = {
+  for: "friend"
+};
+
+render(<Greeting name="Mark" />, document.getElementById("root"));
+
+```
+
+将propTypes和defaultProps指定为**函数或变量的属性**
 
