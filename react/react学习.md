@@ -109,6 +109,8 @@ class Counter extends React.Component {
 
 无状态功能组件**是功能性的**，因为它们可以**写为命名函数或分配给变量的匿名函数表达式**。它们**只接受props**，因为它们根据**给定的输入返回相同的输出**，基本上被认为是纯粹的。这使得它们更快，因为React可能通过**避免不必要的生命周期检查或内存分配来进行优化**
 
+**即使在无状态功能组件上，您仍然可以defaultProps和propTypes**
+
 ```javascript
 import React from "react";
 import { render } from "react-dom";
@@ -131,3 +133,9 @@ render(<Greeting name="Mark" />, document.getElementById("root"));
 
 将propTypes和defaultProps指定为**函数或变量的属性**
 
+## 组件通信
+
+让组件相互通信，你传递props，当你传递props时，你做了两件简单的事情
+
+1. **访问父级数据（state或props）**
+2. **将该数据传递给子组件**
