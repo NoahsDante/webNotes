@@ -176,7 +176,7 @@ render(<Greeting name="Mark" />, document.getElementById("root"));
 
 <https://raw.githubusercontent.com/NoahsDante/webNotes/master/react/image/lifecycle_in_React.png>
 
-![lifecycle_in_React.](https://github.com/NoahsDante/webNotes/blob/master/react/image/lifecycle_in_React.png)
+![lifecycle_in_React.](https://raw.githubusercontent.com/NoahsDante/webNotes/master/react/image/1.png)
 
 ## 生命周期方法
 
