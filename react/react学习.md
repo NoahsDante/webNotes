@@ -174,7 +174,9 @@ render(<Greeting name="Mark" />, document.getElementById("root"));
 
 在初始化期间以及**组件安装，更新和卸载之前和之后都会调用生命周期方法**。
 
-![lifecycle_in_React.](https://raw.githubusercontent.com/NoahsDante/webNotes/master/react/image/lifecycle_in_React.png)
+<https://raw.githubusercontent.com/NoahsDante/webNotes/master/react/image/lifecycle_in_React.png>
+
+![lifecycle_in_React.](https://github.com/NoahsDante/webNotes/blob/master/react/image/lifecycle_in_React.png)
 
 ## 生命周期方法
 
