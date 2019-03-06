@@ -150,7 +150,35 @@ render(<Greeting name="Mark" />, document.getElementById("root"));
 
 # React中的渲染和生命周期方法
 
+## 渲染过程
 
+### 介绍生命周期方法
 
+生命周期是一种思考组件的方式。具有生命周期的组件具有隐喻的“生命” - 至少具有开始，中间和结束
 
+**mounting, updating, and unmounting**
+
+### 生命周期方法的类型
+
+**生命周期方法可以分为两大类**
+
+- **Will methods**—**事情发生之前调用**
+- **Did methods** - **事情发生后立即调用**
+
+组件的生命周期有四个主要部分，每个部分都有相应的生命周期方法
+
+- **Initialization** - 正在**实例化组件类时**
+- **Mounting** - 正在**将一个组件插入DOM中**
+- **Updating** - 正在通过state或props使用新数据更新组件
+- **Unmounting** - 正在**从DOM中删除组件**
+
+在初始化期间以及**组件安装，更新和卸载之前和之后都会调用生命周期方法**。
+
+![lifecycle_in_React.](https://raw.githubusercontent.com/NoahsDante/webNotes/master/react/image/lifecycle_in_React.png)
+
+## 生命周期方法
+
+## 更新React组件
+
+## 使用React创建消息源
 
