@@ -217,3 +217,54 @@ Updating" 方法与与Mounting相关的方法之间的另一个区别是, 它**�
 
 当在**不同的页面之间移动时, 将对删除组件进行分离**，**会调用componentWillUnmount**
 
+# Routing in React
+
+## 更高级的组件设计和使用
+
+### 创建一个路由
+
+```html
+<Router location="/"> 
+    <Route path="/" component={App}> 		
+        <Route path="posts/:post" component={SinglePost} /> 
+        <Route path="login" component={Login} />
+    </Route>
+</Router>
+```
+
+其路由与组件捆绑在一起。路由不一定必须是分层的
+
+### 组件路由
+
+从组件中访问子组件, 并使用**组件本身来设置您的路由。在这里, 您可以开始将组件映射到 url**
+
+### 创建 < route/> 组件
+
+该组件将使用子组件来匹配组件的 url 路由并将其呈现出来
+
+```javascript
+import PropTypes from 'prop­types'; 
+import { Component } from 'react'; 
+import invariant from 'invariant';
+class Route extends Component { 
+    static propTypes = {
+        path: PropTypes.string,
+        component: PropTypes.oneOfType([PropTypes.element, PropTypes.func] 
+  	};
+    render() {
+        return invariant(false, "<Route> elements are for config only and shouldn't be rendered");
+    }
+}
+export default Route;
+```
+
+**invariant这是一个简单的工具, 您将使用它来确保在不满足某些条件时引发错误**。若要使用它, 您需要传递一个值和一条消息。如果该值为 false (null、0、未定义、nan、' ' (空字符串) 或 false), 则会引发错误。
+
+### 开始构建 < route/> 组件
+
+
+
+## 启用具有路由的多页反应应用程序
+
+## 从零开始对路由器进行building化
+
