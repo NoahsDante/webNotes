@@ -174,9 +174,9 @@ render(<Greeting name="Mark" />, document.getElementById("root"));
 
 在初始化期间以及**组件安装，更新和卸载之前和之后都会调用生命周期方法**。
 
-<https://raw.githubusercontent.com/NoahsDante/webNotes/master/react/image/lifecycle_in_React.png>
-
 ![lifecycle_in_React.](https://raw.githubusercontent.com/NoahsDante/webNotes/master/react/image/1.png)
+
+## 生命周期方法
 
 ### Initial and “will” methods
 
@@ -190,12 +190,9 @@ render(<Greeting name="Mark" />, document.getElementById("root"));
 挂载是**React将组件插入真实DOM的过程**。完成后，您的组件“准备就绪”，**通常是执行HTTP调用或读取cookie等操作的好时机**。此时，您还可以通过名为ref的东西访问DOM元素
 
 - **componentWillMount**
-
   - **它将提供在组件安装之前设置状态或执行其他操作的机会;**
   - **此方法中的状态所做的任何更改都不会触发重新渲染**
-
 - componentDidMount 
-
   - **可以对DOM进行操作，这个函数之后ref变成实际的DOM**
   - **可以使用setState()方法触发重新渲染(re-render)**
 
@@ -204,12 +201,9 @@ render(<Greeting name="Mark" />, document.getElementById("root"));
 Updating" 方法与与Mounting相关的方法之间的另一个区别是, 它**们为props和state提供了参数。您可以使用这些来确定是否应进行更新或对更改做出反应**
 
 - **componentWillReceiveProps(nextProps)**
-
   - 在已经挂在的组件(mounted component)接收到新props时触发;
-
   - 只是**调用this.setState()而不是从外部传入props, 那么不会触发componentWillReceiveProps(nextProps)函数**；这就意味着: this.setState()方法不会触发componentWillReceiveProps()
 - **shouldComponentUpdate(nextProps, nextState)**
-
   - 在接收到新props或state时；**在接收新的props或state时确定是否发生重新渲染，默认情况返回true，表示会发生重新渲染**
   - 方法如果**返回false**, 那么props或state发生改变的时候会**阻止子组件发生重新渲染**
 - **componentWillUpdate(nextProps, nextState)**
@@ -219,9 +213,7 @@ Updating" 方法与与Mounting相关的方法之间的另一个区别是, 它**�
   - 在发生更新或componentWillUpdate(nextProps, nextState)后
   - **方法可以对组件中的DOM进行操作**
 
-## 生命周期方法
+### Unmounting 方法
 
-## 更新React组件
-
-## 使用React创建消息源
+当在**不同的页面之间移动时, 将对删除组件进行分离**，**会调用componentWillUnmount**
 
