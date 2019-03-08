@@ -234,33 +234,30 @@ Updating" 方法与与Mounting相关的方法之间的另一个区别是, 它**�
 
 其路由与组件捆绑在一起。路由不一定必须是分层的
 
-### 组件路由
+### 路由器属性
 
-从组件中访问子组件, 并使用**组件本身来设置您的路由。在这里, 您可以开始将组件映射到 url**
+router**路由器将属性传递给它呈现的组件**
 
-### 创建 < route/> 组件
-
-该组件将使用子组件来匹配组件的 url 路由并将其呈现出来
-
-```javascript
-import PropTypes from 'prop­types'; 
-import { Component } from 'react'; 
-import invariant from 'invariant';
-class Route extends Component { 
-    static propTypes = {
-        path: PropTypes.string,
-        component: PropTypes.oneOfType([PropTypes.element, PropTypes.func] 
-  	};
-    render() {
-        return invariant(false, "<Route> elements are for config only and shouldn't be rendered");
-    }
-}
-export default Route;
+```js
+export const Whoops404 = ({ location }) => 
+<div className="whoops-404">
+	<h1>Resource not found at '{location.pathname}'</h1>
+</div>
+<Switch>
+	<Route exact path="/" component={Home} /> 
+    <Route path="/about" component={About} />
+    <Route path="/events" component={Events} />
+    <Route path="/products" component={Products} />
+    <Route path="/contact" component={Contact} />
+    <Route component={Whoops404} />
+</Switch>
 ```
 
-**invariant这是一个简单的工具, 您将使用它来确保在不满足某些条件时引发错误**。若要使用它, 您需要传递一个值和一条消息。如果该值为 false (null、0、未定义、nan、' ' (空字符串) 或 false), 则会引发错误。
+由于我们**只希望在没有其他路由匹配的情况下显示 whoops404 组件**, 因此我们**需要使用 switch 组件**。仅切换组件-播放匹配的第一条路由。这可确保仅呈现其中的一个路由。如果所有位置都不匹配路由, 则**将显示最后一个路由 (不包含路径属性的路由)。**
 
-### 开始构建 < route/> 组件
+### 嵌套路线
+
+
 
 
 
