@@ -219,41 +219,35 @@ Updating" 方法与与Mounting相关的方法之间的另一个区别是, 它**�
 
 # Routing in React
 
-## 更高级的组件设计和使用
+## 动态路由
 
-### 创建一个路由
+指的是**在您的应用呈现时**发生的路由，而不是在正在运行的应用之外的配置或约定中。这意味着几乎所有东西都是React Router中的一个组件
 
-```html
-<Router location="/"> 
-    <Route path="/" component={App}> 		
-        <Route path="posts/:post" component={SinglePost} /> 
-        <Route path="login" component={Login} />
-    </Route>
-</Router>
-```
-
-其路由与组件捆绑在一起。路由不一定必须是分层的
-
-### 路由器属性
-
-router**路由器将属性传递给它呈现的组件**
+## 嵌套路由
 
 ```js
-export const Whoops404 = ({ location }) => 
-<div className="whoops-404">
-	<h1>Resource not found at '{location.pathname}'</h1>
-</div>
-<Switch>
-	<Route exact path="/" component={Home} /> 
-    <Route path="/about" component={About} />
-    <Route path="/events" component={Events} />
-    <Route path="/products" component={Products} />
-    <Route path="/contact" component={Contact} />
-    <Route component={Whoops404} />
-</Switch>
+const App = () => (
+  <BrowserRouter>
+    {/* here's a div */}
+    <div>
+      {/* here's a Route */}
+      <Route path="/tacos" component={Tacos} />
+    </div>
+  </BrowserRouter>
+);
+
+// when the url matches `/tacos` this component renders
+const Tacos = ({ match }) => (
+  // here's a nested div
+  <div>
+    {/* here's a nested Route,
+        match.url helps us make a relative path */}
+    <Route path={match.url + "/carnitas"} component={Carnitas} />
+  </div>
+);
 ```
 
-由于我们**只希望在没有其他路由匹配的情况下显示 whoops404 组件**, 因此我们**需要使用 switch 组件**。仅切换组件-播放匹配的第一条路由。这可确保仅呈现其中的一个路由。如果所有位置都不匹配路由, 则**将显示最后一个路由 (不包含路径属性的路由)。**
+
 
 
 
