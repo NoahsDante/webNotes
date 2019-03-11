@@ -217,37 +217,3 @@ Updating" 方法与与Mounting相关的方法之间的另一个区别是, 它**�
 
 当在**不同的页面之间移动时, 将对删除组件进行分离**，**会调用componentWillUnmount**
 
-# Routing in React
-
-## 动态路由
-
-指的是**在您的应用呈现时**发生的路由，而不是在正在运行的应用之外的配置或约定中。这意味着几乎所有东西都是React Router中的一个组件
-
-## 嵌套路由
-
-```js
-const App = () => (
-  <BrowserRouter>
-    {/* here's a div */}
-    <div>
-      {/* here's a Route */}
-      <Route path="/tacos" component={Tacos} />
-    </div>
-  </BrowserRouter>
-);
-
-// when the url matches `/tacos` this component renders
-const Tacos = ({ match }) => (
-  // here's a nested div
-  <div>
-    {/* here's a nested Route,
-        match.url helps us make a relative path */}
-    <Route path={match.url + "/carnitas"} component={Carnitas} />
-  </div>
-);
-```
-
-
-
-
-
