@@ -3,12 +3,36 @@
 ## 函数式编程功能意味
 
 JavaScript支持函数式编程，**因为JavaScript函数是一等公民**。这意味着函数可以执行变量可以执行的操作；
-
 函数可以表示应用程序中的数据；**功能就是数据。它们可以像变量一样保存，检索或流经应用程序**
 
 ## 命令编程与函数编程
 
+### 函数式编程
 
+```javascript
+const string = "This is the mid day show with Cheryl Waters" const urlFriendly = string.replace(/ /g, "-")
+console.log(urlFriendly)
+```
+
+
+
+是更大的编程范式的一部分：**声明性编程**。声明性编程是一种编程风格，其中**应用程序的结构优先于描述在定义应该如何发生时应该发生的事情**;语法本身**描述了应该发生的事情以及事情发生的细节被抽象出来**
+
+### 命令式程序
+
+```javascript
+var string = "This is the midday show with Cheryl Waters"; var urlFriendly = "";
+for (var i=0; i<string.length; i++) 
+{ 
+   if (string[i] === " ") {
+       urlFriendly += "-"; }else{
+       urlFriendly += string[i];
+   }
+}
+    console.log(urlFriendly);
+```
+
+需要**大量注释才能理解正在发生的事情**
 
 # **React**中的数据和数据流
 
