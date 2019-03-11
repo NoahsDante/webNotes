@@ -69,8 +69,69 @@ console.log(color_lawn.rating)
 
 使用Object.assign来更改颜色评级。 Object.assign是复制机器;它需要一个空白对象，将颜色复制到该对象，**并覆盖副本上的评级**。现在我们可以**拥有一个新评级的颜色对象，而无需更改原始颜色。**
 
+### 纯函数
 
-# **React**中的数据和数据流
+纯函数是一个函数，**它返回一个基于其参数计算的值**
+
+```javascript
+var frederick = {
+    name: "Frederick Douglass", 
+    canRead: false,
+    canWrite: false
+}
+function selfEducate() { 
+    frederick.canRead = true 
+    frederick.canWrite = true 
+    return frederick
+}
+selfEducate()
+console.log( frederick )
+// {name: "Frederick Douglass", canRead: true, canWrite: true}
+```
+
+selfEducate函数不是纯函数。**它不接受任何参数，也不返回值或函数。它还改变了范围之外的变量**
+
+```javascript
+const frederick = {
+    name: "Frederick Douglass", canRead: false,
+    canWrite: false
+}
+const selfEducate = (person) => { 
+    person.canRead = true person.canWrite = true
+    return person
+}
+console.log( selfEducate(frederick) )
+console.log( frederick )
+// {name: "Frederick Douglass", canRead: true, canWrite: true}
+// {name: "Frederick Douglass", canRead: true, canWrite: true}
+```
+
+这种selfEducate功能也是不纯的：它会引起副作用。调用此函数会**改变发送给它的对象**
+
+```javascript
+const frederick = {
+	name: "Frederick Douglass", 
+    canRead: false,
+    canWrite: false
+}
+const selfEducate = person => ({
+	...person, canRead: true, canWrite: true
+})
+console.log( selfEducate(frederick) )
+console.log( frederick )
+// {name: "Frederick Douglass", canRead: true, canWrite: true}
+// {name: "Frederick Douglass", canRead: false, canWrite: false}
+```
+
+它根据发送给它的参数计算一个值：person。**它返回一个新的person对象，而不会改变发送给它的参数，因此没有副作用**
+
+#### 在编写函数时，请尝试遵循这三个规则
+
+1. **该函数应至少包含一个参数**
+2. **该函数应返回一个值或另一个函数**
+3. 该函数**不应更改或改变其任何参数**
+
+# React中的数据和数据流
 
 ## 介绍状态
 
