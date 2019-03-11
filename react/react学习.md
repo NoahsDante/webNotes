@@ -16,7 +16,11 @@ console.log(urlFriendly)
 
 
 
-是更大的编程范式的一部分：**声明性编程**。声明性编程是一种编程风格，其中**应用程序的结构优先于描述在定义应该如何发生时应该发生的事情**;语法本身**描述了应该发生的事情以及事情发生的细节被抽象出来**
+是更大的编程范式的一部分：**声明性编程**。声明性编程是一种编程风格，
+
+- 其中**应用程序的结构优先于描述在定义应该如何发生时应该发生的事情**;
+- 语法本身**描述了应该发生的事情以及事情发生的细节被抽象出来**;
+- 具**可读性，因此更容易推理**
 
 ### 命令式程序
 
@@ -33,6 +37,38 @@ for (var i=0; i<string.length; i++)
 ```
 
 需要**大量注释才能理解正在发生的事情**
+
+## 函数式编程概念
+
+### 不变性
+
+变异是要改变，所以不可改变是不可改变的。在功能程序中，数据是不可变的。它永远不会改变。
+。我们**不是更改原始数据结构**，而是构建**这些数据结构的更改副本并使用它们**。
+
+```javascript
+let color_lawn = { 
+    title: "lawn",
+    color: "#00FF00",
+    rating: 0
+}
+function rateColor(color, rating) { 
+    color.rating = rating
+return color
+}
+console.log(rateColor(color_lawn, 5).rating) // 5
+console.log(color_lawn.rating) // 5
+// 或者
+var rateColor = function(color, rating) {
+return Object.assign({}, color, {rating:rating})
+}
+console.log(rateColor(color_lawn, 5).rating) // 5
+console.log(color_lawn.rating)
+```
+
+在JavaScript中，函数参数是对**实际数据的引用**。像这样设置颜色的评级是不好的，**因为它会改变或改变原始颜色对象。** 
+
+使用Object.assign来更改颜色评级。 Object.assign是复制机器;它需要一个空白对象，将颜色复制到该对象，**并覆盖副本上的评级**。现在我们可以**拥有一个新评级的颜色对象，而无需更改原始颜色。**
+
 
 # **React**中的数据和数据流
 
