@@ -247,7 +247,7 @@ module.exports = function(webpackEnv) {
       runtimeChunk: true,
     },
     resolve: {
-      // This allows you to set a fallback for where Webpack should look for modules.
+        // This allows you to set a fallback for where Webpack should look for modules.
       // We placed these paths second because we want `node_modules` to "win"
       // if there are any conflicts. This matches Node resolution mechanism.
       // https://github.com/facebook/create-react-app/issues/253
@@ -268,6 +268,13 @@ module.exports = function(webpackEnv) {
         // Support React Native Web
         // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
         'react-native': 'react-native-web',
+
+        $components:path.resolve(__dirname, '../src/components'),
+
+        $imgage:path.resolve(__dirname, '../src/static/image'),
+        $style:path.resolve(__dirname, '../src/static/style'),
+
+
       },
       plugins: [
         // Adds support for installing with Plug'n'Play, leading to faster installs and adding
