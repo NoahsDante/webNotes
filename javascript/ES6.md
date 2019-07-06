@@ -558,3 +558,82 @@ let { secure, path, domain, expires } = options;
 ### 参数解构的默认值
 
 参数解构给每个属性都提供了默认值，所以你可以避免检查指定属性是否已被传入（以便在未传入时使用正确的值）。而整个解构的参数同样有一个默认值，即一个空对象
+
+# 符号与符号属性
+
+符号起初是被设计用于创建对象私有成员，"私有名称"意味着开发者可以创建非字符串类型的属性名称，由此防止使用常规手段来探查这些名称。
+
+## 创建符号值
+
+**符号没有字面量形式，这在JS的基本类型中是独一无二的，可以使用全局Symbol函数来创建一符号值;**
+
+Symbol函数还可以接受一个额外的参数用于描述符号值，该描述并不能用来访问对应属性，但它能用于调试；
+
+符号的描述信息被存储在内部属性[[description]]中，当符号的符号的toString()方法被显示或隐式调用时，该属性都会被读取。没有任何办法可以从代码中直接访问[[description]]属性。
+
+## 使用符号值
+
+可以在任意能使用"需计算属性名"的场合使用符号；Object.defineProperty() 或   Object.defineProperties() 调用中使用它
+
+## 共享符号值
+
+跨越文件或代码来追踪符号值是很困难并且易错的；S6 提供了“全局符号注册表”供你在任意时间点进行访问。想创建共享符号值，应使用   Symbol.for() 方法而不是   Symbol() 方法。   Symbol.for() 方法仅接受单个字符串类型的参数，作为目标符号值的标识符，同时此参数也会成为该符号的描述信息。
+
+Symbol.for() 方法首先会搜索全局符号注册表，看是否存在一个键值为   "uid" 的符号值。若是，该方法会返回这个已存在的符号值；否则，会创建一个新的符号值，并使用该键值将其记录到全局符号注册表中，然后返回这个新的符号值；
+
+Symbol.keyFor() 方法在全局符号注册表中根据符号值检索出对应的键值；
+
+## 符号值的转换
+
+符号类型在进行转换时非常不灵活，因为其他类型缺乏与符号值的合理等价，尤其是符号值无法被转换为字符串值或数值
+
+## 检索符号属性
+
+Object.keys() 与   Object.getOwnPropertyNames() 方法可以检索对象的所有属性名称，前者返回所有的可枚举属性名称，而后者则返回所有属性名称而无视其是否可枚举。然而两者都不能返回符号类型的属性，以保持它们在 ES5 中的功能不发生变化。
+
+ES6 新增了Object.getOwnPropertySymbols() 方法，以便让你可以检索对象的符号类型属性；
+
+Object.getOwnPropertySymbols() 方法会返回一个数组，包含了对象自有属性名中的符号值，
+
+## 使用知名符号暴露内部方法
+
+### Symbol.haslnstance 属性
+
+于判断指定对象是否为本函数的一个实例。这个方法定义在   Function.prototype 上，因此所有函数都继承了面对   instanceof 运算符时的默认行为
+
+### Symbol.isConcalSpreadable
+
+一个布尔类型值，在集合对象作为参数传递给Array.prototype.concat() 方法时，指示是否要将该集合的元素扁平化
+
+### Symbol.match
+
+供String.prototype.match() 函数使用的一个方法，用于比较字符串
+
+### Symbol.replace
+
+供String.prototype.replace() 函数使用的一个方法，用于替换子字符串
+
+### Symbol.search
+
+供String.prototype.search() 函数使用的一个方法，用于定位子字符
+
+### Symbol.split
+
+供String.prototype.split() 函数使用的一个方法，用于分割字符串
+
+### Symbol.toPrimitve
+
+供String.prototype.split() 函数使用的一个方法，用于分割字符串
+
+### Symbol.toStringTag
+
+供String.prototype.toString() 函数使用的一个方法，用于创建对象的描述信息
+
+#### 识别问题的变通解决方法
+
+#### ES6给出的答案
+
+### Symbol.unscopables
+
+​	
+
