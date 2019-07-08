@@ -728,3 +728,72 @@ Weak Set 与正规 Set 之间最大的区别是对象的弱引用
 ## ES6的Map	
 
 ES6 的   Map 类型是键值对的有序列表，而键和值都可以是任意类型。键的比较使用的是Object.is()
+
+# 迭代器与生成器
+
+## 循环的问题
+
+使用for循环虽然这个循环非常直观，然而当它被嵌套使用并要追踪多个变量时，情况就会变得非常复杂。额外的复杂度会引发错误，而for循环的样板性也增加了自身出错的可能性，因为相似的代码会被写在多个地方。迭代器正是用来解决此问题的。
+
+## 何为迭代器？
+
+迭代器是被设计专用于迭代的对象，带有特定接口。所有的迭代器对象都拥有   next() 方法，会返回一个结果对象。该结果对象有两个属性：对应下一个值的   value ，以及一个布尔类型的   done ，其值为   true 时表示没有更多值可供使用。迭代器持有一个指向集合位置的内部指针，每当调用了   next() 方法，迭代器就会返回相应的下一个值。若你在最后一个值返回后再调用   next() ，所返回的   done 属性值会是   true ，并且value 属性值会是迭代器自身的返回值（ return value ，即使用 return 语句明确返回的值）
+
+```javascript
+function createIterator(items) {
+var i = 0;
+return {
+next: function() {
+var done = (i >= items.length);
+var value = !done ? items[i++] : undefined;
+return {
+done: done,
+value: value
+  };
+}
+};
+}
+```
+
+## 何为生成器？
+
+生成器（ generator ）是**能返回一个迭代器的函数**。生成器函数由放在   function 关键字之后的一个星号（   * ）来表示，并能使用新的   yield 关键字。将星号紧跟在   function 关键字之后;
+
+yield 关键字只能用在生成器内部，**用于其他任意位置都是语法错误，即使在生成器内部的函数中也不行**
+
+## 生成器函数表达式
+
+可以使用函数表达式来创建一个生成器，只要在   function 关键字与圆括号之间使用一个星号（   * ）即可;
+
+## 生成器对象方法
+
+由于生成器就是函数，因此也可以被添加到对象中;
+
+## 可迭代对象与for-of循环
+
+ ES6 中，所有的集合对象（数组、 Set 与 Map ）以及字符串都是可迭代对象;它们都被指定了默认的迭代器；可迭代对象被设计用于与 ES 新增的   for-of 循环配合使用。
+
+生成器创建的所有迭代器都是可迭代对象；
+
+它完全删除了追踪集合索引的需要，让你无拘束地专注于操作集合内容；
+
+for-of 循环一般不易出错，**因为需要留意的条件更少；传统的   for 循环被保留用于处理更复杂的控制条件**
+
+## 访问默人迭代器
+
+可以使用   Symbol.iterator 来访问对象上的默认迭代器
+
+```javascript
+let values = [1, 2, 3];
+let iterator = values[Symbol.iterator]();
+console.log(iterator.next()); // "{ value: 1, done: false }"
+console.log(iterator.next()); // "{ value: 2, done: false }"
+console.log(iterator.next()); // "{ value: 3, done: false }"
+console.log(iterator.next()); // "{ value: undefined, done: true }"
+```
+
+## 创建可迭代对象
+
+## 内置的迭代器
+
+## 集合的迭代器
