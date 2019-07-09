@@ -797,3 +797,241 @@ console.log(iterator.next()); // "{ value: undefined, done: true }"
 ## 内置的迭代器
 
 ## 集合的迭代器
+
+# JS类
+
+与大多数正规的面向对象编程语言不同， JS 从创建之初就不支持类，也没有把类继承作为定义相似对象以及关联对象的主要方式，这让不少开发者感到困惑
+
+## ES5中的仿类结构
+
+与类最接近的是：创建一个构造器，然后将方法指派到该构造器的原型上。这种方式通常被称为创建一个自定义类型;
+
+```javascript
+function PersonType(name) {
+this.name = name;
+}
+PersonType.prototype.sayName = function() {
+console.log(this.name);
+};
+let person = new PersonType("Nicholas"); person.sayName(); // 输出 "Nicholas"
+```
+
+## 类的声明
+
+类在 ES6 中最简单的形式就是类声明，它看起来很像其他语言中的类
+
+### 基本的类声明
+
+类声明以   class 关键字开始，其后是类的名称；剩余部分的语法看起来就像对象字面量中的方法简写，并且在方法之间不需要使用逗号
+
+```javascript
+class PersonClass {
+// 等价于 PersonType 构造器
+constructor(name) {
+this.name = name;
+}
+  // 等价于 PersonType.prototype.sayName
+sayName() {
+console.log(this.name);
+}
+}
+let person = new PersonClass("Nicholas"); person.sayName(); // 输出 "Nicholas"
+console.log(person instanceof PersonClass); // true console.log(person instanceof Object); // true console.log(typeof PersonClass); // "function"
+console.log(typeof PersonClass.prototype.sayName); // "function"
+```
+
+1. 类声明不会被提升，这与函数定义不同。类声明的行为与   let 相似，因此在程序的执行
+
+到达声明处之前，类会存在于暂时性死区内。
+
+2. 类声明中的所有代码会自动运行在严格模式下，并且也无法退出严格模式。
+3. 类的所有方法都是不可枚举的，这是对于自定义类型的显著变化，后者必须用Object.defineProperty() 才能将方法改变为不可枚举。
+4. 类的所有方法内部都没有   [[Construct]] ，因此使用   new 来调用它们会抛出错误
+5. 调用类构造器时不使用   new ，会抛出错误。
+6. 试图在类的方法内部重写类名，会抛出错误
+
+### 为何要使用类的语法
+
+类语法显著简化了所有功能的代码
+
+## 类表达式
+
+函数声明与类声明都以适当的关键词为起始（分别是   function 与   class ），随后是标识符（即函数名或类名）。函数具有一种表达式形式，无须在   function 后面使用标识符；类似的，类也有不需要标识符的表达式形式。类表达式被设计用于变量声明，或可作为参数传递给函数。
+
+### 基本的类表达式
+
+```javascript
+let PersonClass = class {
+// 等价于 PersonType 构造器
+constructor(name) {
+  this.name = name;
+}
+// 等价于 PersonType.prototype.sayName
+sayName() {
+console.log(this.name);
+}
+};
+let person = new PersonClass("Nicholas"); person.sayName(); // 输出 "Nicholas"
+console.log(person instanceof PersonClass); // true console.log(person instanceof Object); // true console.log(typeof PersonClass); // "function"
+console.log(typeof PersonClass.prototype.sayName); // "function"
+```
+
+类表达式不需要在   class 关键字后使用标识符。除了语法差异，类表达式的功能等价于类声明;
+
+类声明与类表达式都不会被提升
+
+### 具名类表达式
+
+可以为类表达式命名。为此需要在   class 关键字后添加标识符
+
+```javascript
+let PersonClass = class PersonClass2 {
+// 等价于 PersonType 构造器
+constructor(name) {
+this.name = name;
+}
+// 等价于 PersonType.prototype.sayName
+sayName() {
+  console.log(this.name);
+}
+};
+console.log(typeof PersonClass); // "function"
+console.log(typeof PersonClass2); // "undefined"
+```
+
+此例中的类表达式被命名为   PersonClass2 。   PersonClass2 标识符只在类定义内部存在，因此只能用在类方法内部（例如本例的   sayName() 内）。在类的外部，   typeof PersonClass2 的结果为   "undefined" ，这是因为外部不存在   PersonClass2 绑定;
+
+## 作为一级公民
+
+能被当作值来使用的就称为一级公民（ first-class citizen ），意味着它能作为参数传给函数、能作为函数返回值、能用来给变量赋值
+
+## 访问器属性
+
+类还允许你在原型上定义访问器属性。为了创建一个getter ，要使用   get 关键字，并要与后方标识符之间留出空格；创建 setter 用相同方式，只是要换用   set 关键字
+
+```javascript
+class CustomHTMLElement {
+constructor(element) {
+this.element = element;
+  }
+get html() {
+return this.element.innerHTML;
+}
+set html(value) {
+this.element.innerHTML = value;
+}
+}
+var descriptor = Object.getOwnPropertyDescriptor(CustomHTMLElement.prototype, "html"); console.log("get" in descriptor); // true console.log("set" in descriptor); // true console.log(descriptor.enumerable); // false
+```
+
+
+
+## 需要计算的成员名
+
+类方法与类访问器属性也都能使用需计算的名称。语法相同于对象字面量中的需计算名称：无须使用标识符，而是用方括号来包裹一个表达式
+
+访问器属性能以相同方式使用需计算的名称
+
+```javascript
+let methodName = "sayName";
+class PersonClass {
+constructor(name) {
+this.name = name;
+}
+[methodName]() {
+console.log(this.name);
+  }
+ get [methodName]() {
+console.log(this.name);
+  }
+}
+let me = new PersonClass("Nicholas"); me.sayName(); // "Nicholas"
+```
+
+
+
+## 生成器的方法
+
+只要在方法名称前附加一个星号（   * ）
+
+## 静态成员
+
+直接在构造器上添加额外方法来模拟静态成员;只要在方法与访问器属性的名称前添加正式的   static 标注;
+
+只多了一个   static 关键字。你能在类中的任何方法与访问器属性上使用   static 关键字，唯一限制是不能将它用于   constructor 方法的定义。静态成员不能用实例来访问
+
+## 使用派生类进行继承
+
+```javascript
+class Rectangle {
+constructor(length, width) {
+this.length = length;
+this.width = width;
+}
+getArea() {
+return this.length * this.width;
+}
+}
+class Square extends Rectangle {
+  constructor(length) {
+// 与 Rectangle.call(this, length, length) 相同
+super(length, length);
+}
+}
+var square = new Square(3);
+console.log(square.getArea()); // 9
+console.log(square instanceof Square); // true console.log(square instanceof Rectangle); // true 此次   Square 类使用了   extends 关键字继承了   Rectangle
+```
+
+Square 构造器使用了super() 配合指定参数调用了   Rectangle 的构造器;继承了其他类的类被称为派生类（ derived classes ）。如果派生类指定了构造器，就需要使用   super() ，否则会造成错误。若你选择不使用构造器，super() 方法会被自动调用，并会使用创建新实例时提供的所有参数
+
+使用   super() 时需牢记以下几点
+
+1. 你只能在派生类中使用   super() 。若尝试在非派生的类（即：没有使用   extends 关键字的类）或函数中使用它，就会抛出错误。
+
+2. 在构造器中，你必须在访问   this 之前调用   super() 。由于   super() 负责初始化this ，因此试图先访问   this 自然就会造成错误。
+
+3. 唯一能避免调用   super() 的办法，是从类构造器中返回一个对象。
+
+### 屏蔽类方法
+
+派生类中的方法总是会屏蔽基类的同名方法
+
+### 继承静态成员
+
+如果基类包含静态成员，那么这些静态成员在派生类中也是可用的
+
+### 从表达式中派生类
+
+可以对其使用   extends;**extends 后面能接受任意类型的表达式**;
+
+表达式类型会导致错误
+
+null ；
+
+生成器函数
+
+试图使用结果为上述值的表达式来创建一个新的类实例，都会抛出错误，因为不存在[[Construct]] 可供调用
+
+### 继承内置对象
+
+```javascript
+class MyArray extends Array {
+// 空代码块
+  }
+var colors = new MyArray();
+colors[0] = "red";
+console.log(colors.length); // 1
+colors.length = 0;
+```
+
+### Symbol.species 属性
+
+任意能返回内置对象实例的方法，在派生类上却会自动返回派生类的实例;
+
+Symbol.species 知名符号被用于定义一个能返回函数的静态访问器属性。每当类实例的方法（构造器除外）必须创建一个实例时，前面返回的函数就被用为新实例的构造器
+
+## 在类构造器中使用new.target
+
+因为构造器能根据如何被调用而有不同行为，并且这给了更改这种行为的能力
+
