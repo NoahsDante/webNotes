@@ -1215,7 +1215,178 @@ JS 引擎在同一时刻只能执行一段代码，所以引擎无须留意那�
 
 ## 异步任务运行
 
+# 代理与反射接口
 
+## 数组的问题
+
+给数组元素赋值时，数组的   length 属性会受到影响，同时你也可以通过修改length 属性来变更数组的元素
+
+## 代理与反射是什么
+
+通过调用 new Proxy() ，你可以创建一个代理用来替代另一个对象（被称为目标），这个代理对目标对象进行了虚拟，因此该代理与该目标对象表面上可以被当作同一个对象来对待；
+
+代理允许你拦截在目标对象上的底层操作，而这原本是 JS 引擎的内部能力。拦截行为使用了一个能够响应特定操作的函数被   Reflect 对象所代表的反射接口，是给底层操作提供默认行为的方法的集合，这些操作是能够被代理重写的。每个代理陷阱都有一个对应的反射方法，每个方法都与对应的陷阱函数同名，并且接收的参数也与之一致
+
+## 创建一个简单的代理
+
+```javascript
+let target = {};
+let proxy = new Proxy(target, {});
+proxy.name = "proxy";
+console.log(proxy.name); // "proxy"
+console.log(target.name); // "proxy"
+target.name = "target";
+console.log(proxy.name); // "target"
+console.log(target.name); // "target"
+```
+
+
+
+## 使用set陷阱函数验证属性性值
+
+```javascript
+let proxy = new Proxy(target, {
+set(trapTarget, key, value, receiver) {
+// 忽略已有属性，避免影响它们
+if (!trapTarget.hasOwnProperty(key)) {
+if (isNaN(value)) {
+throw new TypeError("Property must be a number.");
+}
+}
+// 添加属性
+return Reflect.set(trapTarget, key, value, receiver);
+}
+});
+```
+
+允许你在写入属性值的时候进行拦截
+
+## 使用get陷阱函数进行对象外形验证
+
+get 代理陷阱则允许你在读取属性
+
+```javascript
+let proxy = new Proxy({}, {
+get(trapTarget, key, receiver) {
+if (!(key in receiver)) {
+throw new TypeError("Property " + key + " doesn't exist.");
+}
+return Reflect.get(trapTarget, key, receiver);
+}
+});
+// 添加属性的功能正常
+proxy.name = "proxy";
+console.log(proxy.name); // "proxy"
+// 读取不存在属性会抛出错误
+console.log(proxy.nme); // 抛出错误
+```
+
+
+
+## 使用has陷阱函数隐藏属性
+
+has 陷阱函数会在使用   in 运算符的情况下被调用
+
+## 使用deleteProperty陷阱函数避免属性被删除
+
+delete 运算符能够从指定对象上删除一个属性，在删除成功时返回   true ，否则返回false 。如果试图用   delete 运算符去删除一个不可配置的属性，在严格模式下将会抛出错误；而非严格模式下只是单纯返回   false 
+
+## 原型代理的陷阱函数
+
+代理允许你通过   setPrototypeOf 与getPrototypeOf 陷阱函数来对这两个方法的操作进行拦截
+
+### 原型代理的陷阱函数如何工作
+
+### 为何存在两组方法
+
+## 对象可扩展性的陷阱函数
+
+### 两个基本范例
+
+### 可扩展的重复方法
+
+## 属性描述符的陷阱函数
+
+### 阻止Object.defineProperty()
+
+### 描述符对象的限制
+
+### 重复的描述方法
+
+#### defineProperty()方法
+
+#### getOwnPropertyDescriptor()方法
+
+## ownKeys陷阱函数
+
+## 使用apply与construct陷阱函数的函数代理
+
+只有 apply 与   construct 要求代理目标对象必须是一个函数
+
+```javascript
+let target = function() { return 42 },
+proxy = new Proxy(target, {
+apply: function(trapTarget, thisArg, argumentList) {
+return Reflect.apply(trapTarget, thisArg, argumentList);
+  },
+construct: function(trapTarget, argumentList) {
+return Reflect.construct(trapTarget, argumentList);
+}
+});
+console.log(typeof proxy); // "function"
+console.log(proxy()); // 42
+var instance = new proxy();
+```
+
+
+
+### 验证函数的参数
+
+### 调用构造器而无须使用new
+
+```javascript
+function Numbers(...values) {
+if (typeof new.target === "undefined") {
+throw new TypeError("This function must be called with new.");
+  }
+this.values = values;
+}
+let NumbersProxy = new Proxy(Numbers, {
+apply: function(trapTarget, thisArg, argumentsList) {
+return Reflect.construct(trapTarget, argumentsList);
+}
+});
+let instance = NumbersProxy(1, 2, 3, 4);
+console.log(instance.values); // [1,2,3,4]
+```
+
+### 重写抽象基础类的构造器
+
+### 可被调用的类构造器
+
+## 可被撤销的代理
+
+revoke() 函数被调用后，就不能再对该   proxy 对象进行更多操作，任何与该代理对象交互的意图都会触发代理的陷阱函数，从而抛出一个错误
+
+## 解决数组的问题
+
+### 检测数组的索引
+
+### 在添加新元素时增加长度属性
+
+### 在减少长度属性时移除元素
+
+### 实现MyArray类
+
+## 将代理对象作为原型使用
+
+### 在原型上使用get陷阱函数
+
+### 在原型上使用set陷阱函数
+
+### 在原型上使用has陷阱函数
+
+### 将代理作为类的原型
 
 
 
