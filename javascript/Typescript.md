@@ -168,6 +168,14 @@ let strLength: number = (<someValue as string).length;
 
 ## 变量声明
 
+### Var变量
+
+### let声明
+
+### const声明
+
+### let vs const
+
 
 
 ## 接口
