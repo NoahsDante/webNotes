@@ -170,13 +170,185 @@ let strLength: number = (<someValue as string).length;
 
 ### Var变量
 
+```
+function f(shouldInitialize: boolean) {
+    if (shouldInitialize) {
+        var x = 10;
+    }
+
+    return x;
+}
+
+f(true);  // returns '10'
+f(false); // returns 'undefined'
+```
+
+`var`声明可以在包含它的函数，模块，命名空间或全局作用域内部任何位置被访问
+
+在作用域内的变量，会共享
+
 ### let声明
+
+#### 块级作用域
+
+当用`let`声明一个变量，它使用的是*词法作用域*或*块作用域*。 不同于使用 `var`声明的变量那样可以在包含它们的函数外访问，块作用域变量在包含它们的块或`for`循环之外是不能访问
+
+拥有块级作用域的变量的另一个特点是，它们不能在被声明之前读或写。 虽然这些变量始终“存在”于它们的作用域里，但在直到声明它的代码之前的区域都属于 *暂时性死区*。 它只是用来说明我们不能在 `let`语句之前访问它们
+
+#### 重定义及屏蔽
+
+使用`var`声明时，它不在乎你声明多少次；你只会得到1个
+
+`let`声明就不会这么宽松了
+
+```typescript
+let x = 10;
+let x = 20; // 错误，不能在1个作用域里多次声明`x`
+// 并不是要求两个均是块级作用域的声明TypeScript才会给出一个错误的警告。
+function f(x) {
+    let x = 100; // error: interferes with parameter declaration
+}
+
+function g() {
+    let x = 100;
+    var x = 100; // error: can't have both declarations of 'x'
+}
+// 并不是说块级作用域变量不能用函数作用域变量来声明。 而是块级作用域变量需要在明显不同的块里声明。
+
+function f(condition, x) {
+    if (condition) {
+        let x = 100;
+        return x;
+    }
+
+    return x;
+}
+
+f(false, 0); // returns 0
+f(true, 0);  // returns 100
+```
+
+在一个嵌套作用域里引入一个新名字的行为称做*屏蔽*。 它是一把双刃剑，它可能会不小心地引入新问题，同时也可能会解决一些错误
+
+```typescript
+function sumMatrix(matrix: number[][]) {
+    let sum = 0;
+    for (let i = 0; i < matrix.length; i++) {
+        var currentRow = matrix[i];
+        for (let i = 0; i < currentRow.length; i++) {
+            sum += currentRow[i];
+        }
+    }
+
+    return sum;
+}
+```
+
+内层循环的`i`可以屏蔽掉外层循环的`i`
+
+#### 块级作用域变量的获取
+
+当`let`声明出现在循环体里时拥有完全不同的行为。 不仅是在循环里引入了一个新的变量环境，而是针对 *每次迭代*都会创建这样一个新作用域
 
 ### const声明
 
+它们与`let`声明相似，但是就像它的名字所表达的，它们被赋值后不能再改变。 换句话说，它们拥有与 `let`相同的作用域规则，但是不能对它们重新赋值
+
+实际上`const`变量的内部状态是可修改的
+
 ### let vs const
 
+使用[最小特权原则](https://en.wikipedia.org/wiki/Principle_of_least_privilege)，所有变量除了你计划去修改的都应该使用`const`。 基本原则就是如果一个变量不需要对它写入，那么其它使用这些代码的人也不能够写入它们，并且要思考为什么会需要对这些变量重新赋值。 使用 `const`也可以让我们更容易的推测数据的流动
 
+### 解构
+
+最简单的解构莫过于数组的解构赋值了：
+
+```typescript
+let input = [1, 2];
+let [first, second] = input;
+console.log(first); // outputs 1
+console.log(second); // outputs 2
+// 在数组里使用...语法创建剩余变量
+let [first, ...rest] = [1, 2, 3, 4];
+console.log(first); // outputs 1
+console.log(rest); // outputs [ 2, 3, 4 ]
+```
+
+#### 对象解构
+
+```typescript
+let o = {
+    a: "foo",
+    b: 12,
+    c: "bar"
+};
+let { a, b } = o;
+// 可以用没有声明的赋值
+({ a, b } = { a: "baz", b: 101 });
+// 可以在对象里使用...语法创建剩余变量
+let { a, ...passthrough } = o;
+let total = passthrough.b + passthrough.c.length;
+```
+
+##### 属性重命名
+
+可以给属性以不同的名字
+
+```typescript
+let { a: newName1, b: newName2 } = o;
+let {a, b}: {a: string, b: number} = o;
+```
+
+##### 默认值
+
+```typescript
+function keepWholeObject(wholeObject: { a: string, b?: number }) {
+    let { a, b = 1001 } = wholeObject;
+}
+```
+
+### 函数声明
+
+```typescript
+type C = { a: string, b?: number }
+function f({ a, b }: C): void {
+    // ...
+}
+function f({ a="", b=0 } = {}): void {
+    // ...
+}
+f();
+```
+
+### 展开
+
+展开操作符正与解构相反。 它允许你将一个数组展开为另一个数组，或将一个对象展开为另一个对象。 例如：
+
+```typescript
+let first = [1, 2];
+let second = [3, 4];
+let bothPlus = [0, ...first, ...second, 5];
+// 还可以展开对象
+let defaults = { food: "spicy", price: "$$", ambiance: "noisy" };
+let search = { ...defaults, food: "rich" };
+```
+
+出现在展开对象后面的属性会覆盖前面的属性
+
+首先，它仅包含对象 [自身的可枚举属性](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Enumerability_and_ownership_of_properties)。 大体上是说当你展开一个对象实例时，你会丢失其方法
+
+```typescript
+class C {
+  p = 12;
+  m() {
+  }
+}
+let c = new C();
+let clone = { ...c };
+clone.p; // ok
+clone.m(); // error!
+```
 
 ## 接口
 
