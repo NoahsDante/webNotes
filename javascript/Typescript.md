@@ -352,6 +352,91 @@ clone.m(); // error!
 
 ## 接口
 
+为了这些类型命名和代码或第三方代码定义契约
+
+### 接口初探
+
+```typescript
+function printLabel(labelledObj: { label: string }) {
+  console.log(labelledObj.label);
+}
+
+let myObj = { size: 10, label: "Size 10 Object" };
+printLabel(myObj);
+```
+
+类型检查器会查看`printLabel`的调用。 `printLabel`有一个参数，并要求这个对象参数有一个名为`label`类型为`string`的属性。 需要注意的是，我们传入的对象参数实际上会包含很多属性，但是编译器只会检查那些必需的属性是否存在，并且其类型是否匹配
+
+重写上面的例子，这次使用接口来描述：必须包含一个`label`属性且类型为`string`：
+
+```typescript
+interface LabelledValue {
+  label: string;
+}
+
+function printLabel(labelledObj: LabelledValue) {
+  console.log(labelledObj.label);
+}
+
+let myObj = {size: 10, label: "Size 10 Object"};
+printLabel(myObj);
+```
+
+`abelledValue`接口就好比一个名字，用来描述上面例子里的要求。 它代表了有一个 `label`属性且类型为`string`的对象;类型检查器不会去检查属性的顺序，只要相应的属性存在并且类型也是对的就可以
+
+### 可选属性
+
+选属性在应用“option bags”模式时很常用，即给函数传入的参数对象中只有部分属性赋值了
+
+```typescript
+interface SquareConfig {
+  color?: string;
+  width?: number;
+}
+
+function createSquare(config: SquareConfig): {color: string; area: number} {
+  let newSquare = {color: "white", area: 100};
+  if (config.color) {
+    newSquare.color = config.color;
+  }
+  if (config.width) {
+    newSquare.area = config.width * config.width;
+  }
+  return newSquare;
+}
+
+let mySquare = createSquare({color: "black"});
+```
+
+带有可选属性的接口与普通的接口定义差不多，只是在可选属性名字定义的后面加一个`?`符号。
+
+可选属性的好处之一是可以对可能存在的属性进行预定义，好处之二是可以捕获引用了不存在的属性时的错误
+
+### 只读属性
+
+一些对象属性只能在对象刚刚创建的时候修改其值。 你可以在属性名前用 `readonly`来指定只读属性
+
+```typescript
+interface Point {
+    readonly x: number;
+    readonly y: number;
+}
+// 以通过赋值一个对象字面量来构造一个Point。 赋值后， x和y再也不能被改变了
+let p1: Point = { x: 10, y: 20 };
+p1.x = 5; // error!
+// typeScript具有ReadonlyArray<T>类型，它与Array<T>相似，只是把所有可变方法去掉了，因此可以确保数组创建后再也不能被修改
+let a: number[] = [1, 2, 3, 4];
+let ro: ReadonlyArray<number> = a;
+ro[0] = 12; // error!
+ro.push(5); // error!
+ro.length = 100; // error!
+a = ro; // error!
+```
+
+
+
+
+
 ## 类
 
 ## 函数
