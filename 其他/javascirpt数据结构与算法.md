@@ -63,17 +63,19 @@ numbers.shift();
 
 #### splice
 
-> 通过指定位置/索引，就可以删除相应位置和数量的元素
+> 方法通过删除或替换现有元素或者原地添加新的元素来修改数组,并以数组形式返回被修改的内容。此方法会**改变原数组**
 
 ```js
-// 这行代码删除了从数组索引5开始的3个元素。这就意味着numbers[5]、numbers[6]和numbers[7]从数组中删除了。现在数组里的值变成了-3、-2、-1、0、1、5、6、7、8、9、10、11和12（2、3、4已经被移除）
-numbers.splice(5,3);
+const months = ['Jan', 'March', 'April', 'June'];
+months.splice(1, 0, 'Feb');
+// inserts at index 1
+console.log(months);
+// expected output: Array ["Jan", "Feb", "March", "April", "June"]
 
-// splice方法接收的第一个参数，表示想要删除或插入的元素的索引值。第二个参数是删除元素的个数（这个例子里，我们的目的不是删除元素，所以传入0）。第三个参数往后，就是要添加到数组里的值（元素2、3、4）。输出会发现值又变成了从-3到12
-numbers.splice(5,0,2,3,4);
-
-// 输出的值是从-3到12。原因在于，我们从索引5开始删除了3个元素，但也从索引5开始添加了元素2、3、4
-numbers.splice(5,3,2,3,4);
+months.splice(4, 1, 'May');
+// replaces 1 element at index 4
+console.log(months);
+// expected output: Array ["Jan", "Feb", "March", "April", "May"]
 ```
 
 ### 二维和多维数组
@@ -137,7 +139,7 @@ var myMap = numbers.map(isEven);
 
 ##### filter
 
-> 对数组中的每一项运行给定函数，返回该函数会返回`true`的项组成的数组
+> 方法创建一个新数组, 其包含通过所提供函数实现的测试的所有元素
 
 ```js
 var evenNumbers = numbers.filter(isEven);
@@ -146,19 +148,33 @@ var evenNumbers = numbers.filter(isEven);
 
 ##### reduce
 
-> 这个函数会返回一个将被叠加到累加器的值; previousValue`、`currentValue`、`index`和`array
+> 方法对数组中的每个元素执行一个由您提供的**reducer**函数(升序执行)，将其结果汇总为单个返回值
+
+**reducer** 函数接收4个参数:
+
+1. Accumulator (acc) (累计器)
+2. Current Value (cur) (当前值)
+3. Current Index (idx) (当前索引)
+4. Source Array (src) (源数组)
 
 ```js
-numbers.reduce(function(previous, current, index){
-  return previous + current;
-});
+const array1 = [1, 2, 3, 4];
+const reducer = (accumulator, currentValue) => accumulator + currentValue;
+
+// 1 + 2 + 3 + 4
+console.log(array1.reduce(reducer));
+// expected output: 10
+
+// 5 + 1 + 2 + 3 + 4
+console.log(array1.reduce(reducer, 5));
+// expected output: 15
 ```
 
 #### 排序元素
 
 ##### reverse
 
-> 反序输出数组
+> 方法将数组中元素的位置颠倒，并返回该数组。数组的第一个元素会变成最后一个，数组的最后一个元素变成第一个。该方法会**改变原数组**
 
 ```js
 numbers.reverse();// [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
@@ -167,7 +183,7 @@ numbers.reverse();// [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
 
 ##### sort
 
-> 排序；对数组做排序时，把元素默认成字符串进行相互比较；当需要自定义排序时；要自定义函数
+> 默认排序顺序是在将元素转换为字符串，然后比较它们的UTF-16代码单元值序列时构建的；由于它取决于具体实现，因此无法保证排序的时间和空间复杂性
 
 ```js
 numbers.sort(function(a, b){
@@ -307,7 +323,69 @@ console.log(elements.join('-'));
 
 ## 栈
 
+> 遵从后进先出原则的集合。新添加的或待删除的元素都保存在同一端，称作栈顶；在另一端就叫做栈底。
+
+```js
+let items = [];
+function Stack() {
+  //各种属性和方法的声明
+}
+this.push = function(element){
+  items.push(element);
+};
+this.pop = function(){
+  return items.pop();
+}
+this.peek = function(){
+  return items[items.length-1];
+};
+this.isEmpty = function(){
+  return items.length == 0;
+};
+this.size = function(){
+  return items.length;
+};
+this.clear = function(){
+  items = [];
+};
+```
+
+### 解决问题
+
+> 它可以存储访问过的任务或路径、撤销的操作
+
 ## 队列
+
+> 遵循FIFO（First In First Out，**先进先出**，也称为**先来先服务**）原则的一组有序的项;队列在尾部添加新元素，并从顶部移除元素。最新添加的元素必须排在队列的末尾
+
+```js
+function Queue() {
+  //这里是属性和方法
+}
+let items = [];
+this.enqueue = function(element){
+  items.push(element);
+};
+this.dequeue = function(){
+  return items.shift();
+};
+this.front = function(){
+  return items[0];
+};
+this.isEmpty = function(){
+  return items.length == 0;
+};
+this.size = function(){
+  return items.length;
+};
+this.print = function(){
+  console.log(items.toString());
+};
+```
+
+
+
+
 
 ## 链表
 
